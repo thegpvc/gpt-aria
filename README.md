@@ -18,6 +18,14 @@ Technical stack:
 * typescript in extension
 * https://plasmo.com/ framework
 
+### Why ARIA is superior to raw html
+
+html:
+![html](doc/html.png?raw=true "HTML is only good for renders")
+
+html with ARIA accessibility tree:
+![accessibility_tree](doc/accessibility_tree.png?raw=true "HTML is only good for renders")
+
 ## Follow-up ideas
 
 ### Have an index of gpt prompts that explain in natural language how to navigate a particular website.
