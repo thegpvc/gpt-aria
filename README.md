@@ -33,5 +33,6 @@ html with ARIA accessibility tree:
 * For buying a house "redfin provides search functionality and ability to narrow down location and prices"
 * for shopping "amazon.com is a shopping site"
 * likewise for google, wikipedia, etc
+* eventually we'd want langchain-style website modules so you could specify "Summarize my inbox and news" which would be a composition of gmail and news modules
 
 
