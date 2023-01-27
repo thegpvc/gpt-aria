@@ -18,6 +18,7 @@ function get_role(node) {
   return node.role.value
 }
 async function prettyPrintNodes(nodes, outputFile) {
+  const debug = false
   let output = ''
   let map = new Map<number, any>()
   for (let node of nodes) {
@@ -43,12 +44,19 @@ async function prettyPrintNodes(nodes, outputFile) {
     let node = map.get(index)
     let parentId = node.parentId
     let parent = parentId ? map.get(parseInt(parentId)) : undefined
-    node.depth = parent ? parent.depth + 1 : 0
+    let role = get_role(node)
+    // skip group https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/group_role
+    // and ignored nodes
+    if (role === 'group' || node.ignored) {
+      continue
+    }
+    let isVisible = (role !== 'none' && role !== 'generic') ? 1 : 0
+    // convirt isVisible to number
+    node.depth = parent ? parent.depth + isVisible : 0
     let indent = ' '.repeat(node.depth)
     let childIds = node.childIds.map(x => parseInt(x))
-    let role = get_role(node)
     let value = node.name ? node.name.value : ''
-    if (role !== 'none' && role !== 'generic') {
+    if (isVisible) {
       let line = ''
       if (role === 'StaticText') {
         line = `${indent}${JSON.stringify(value)}`
@@ -57,7 +65,10 @@ async function prettyPrintNodes(nodes, outputFile) {
         // figure out if this node has text
         let hasStaticTextChild = hasStaticText(node)
         let summary = (!hasStaticTextChild && value.length) ? JSON.stringify(value) : ''
-        line = `${indent}${role} ${summary} nodeId:${node.nodeId} ${properties}`
+        line = `${indent}${role} ${summary} ${properties}`
+        if (debug) {
+          line += ` nodeId:${node.nodeId}`
+        }
       }
       if (line.length) {
         output += line + '\n'
@@ -76,10 +87,14 @@ async function prettyPrintNodes(nodes, outputFile) {
  */
 (async () => {
   // set to false to make twitter work
-  let headless = false
+  let url = process.argv[2]
+  let headless = true
+  // if url contains twitter, set headless to false
+  if (url.includes('twitter')) {
+    headless = false
+  }
   const browser = await puppeteer.launch({ headless: headless });
   const page: Page = await browser.newPage();
-  let url = process.argv[2]
   // ensure url starts with https://
   if (!url.startsWith('https://')) {
     url = 'https://' + url
