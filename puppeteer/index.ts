@@ -26,6 +26,18 @@ async function prettyPrintNodes(nodes, outputFile) {
     map.set(parseInt(key), value)
   }
   let queue = [1]
+  function hasStaticText(node) {
+    let role = get_role(node)
+    if (role === 'StaticText') {
+      return true
+    }
+    let childIds = node.childIds.map(x => parseInt(x))
+    for (let child of childIds) {
+      if (hasStaticText(map.get(child))) {
+        return true
+      }
+    }
+  }
   while (queue.length) {
     let index = queue.shift() as number
     let node = map.get(index)
@@ -41,9 +53,9 @@ async function prettyPrintNodes(nodes, outputFile) {
       if (role === 'StaticText') {
         line = `${indent}${JSON.stringify(value)}`
       } else {
-        let properties = node.properties.map(x => `${x.name}:${x.value.value}`)
+        let properties = node.properties.map(x => x.name + (x.value.value ? `:${x.value.value}` : ''))
         // figure out if this node has text
-        let hasStaticTextChild = childIds.map(x => get_role(map.get(x))).filter(x => x === 'StaticText').length > 0
+        let hasStaticTextChild = hasStaticText(node)
         let summary = (!hasStaticTextChild && value.length) ? JSON.stringify(value) : ''
         line = `${indent}${role} ${summary} nodeId:${node.nodeId} ${properties}`
       }
@@ -63,11 +75,23 @@ async function prettyPrintNodes(nodes, outputFile) {
  * TODO: connect to own browser via https://medium.com/@jaredpotter1/connecting-puppeteer-to-existing-chrome-window-8a10828149e0
  */
 (async () => {
-  const browser = await puppeteer.launch({ headless: false });
+  // set to false to make twitter work
+  let headless = false
+  const browser = await puppeteer.launch({ headless: headless });
   const page: Page = await browser.newPage();
-  await page.goto( process.argv[2]);
+  let url = process.argv[2]
+  // ensure url starts with https://
+  if (!url.startsWith('https://')) {
+    url = 'https://' + url
+  }
+  await page.goto(url);
+  // sleep for 10 seconds
+  if (!headless) {
+    await new Promise(resolve => setTimeout(resolve, 10 * 1000));
+  }
+
   // replace all slashes with _ in url to make outputFIle
-  let outputFile = process.argv[2].replace('https://', '').replace(/\//g, '_')
+  let outputFile = url.replace('https://', '').replace(/\//g, '_')
   // console.log((page as any)._client);
   let tree = await getAccessibilityTree(page)
   // console.log(JSON.stringify(tree))
@@ -76,7 +100,5 @@ async function prettyPrintNodes(nodes, outputFile) {
   let data = JSON.stringify(tree.nodes)
   await fs.writeFile(outputFile + '.json', data)
   // console.log(await page.accessibility.snapshot());
-  // sleep for 60 seconds
-  // await new Promise(resolve => setTimeout(resolve, 60 * 1000));
   await browser.close();
 })();
