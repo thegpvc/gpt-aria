@@ -35,4 +35,6 @@ html with ARIA accessibility tree:
 * likewise for google, wikipedia, etc
 * eventually we'd want langchain-style website modules so you could specify "Summarize my inbox and news" which would be a composition of gmail and news modules
 
+### Chrome extension that accesses page aria
 
+https://github.com/ziolko/aria-devtools
