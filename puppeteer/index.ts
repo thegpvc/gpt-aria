@@ -47,10 +47,10 @@ async function prettyPrintNodes(nodes, outputFile) {
     let role = get_role(node)
     // skip group https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/group_role
     // and ignored nodes
-    if (role === 'group' || node.ignored) {
+    if (role === 'group') {
       continue
     }
-    let isVisible = (role !== 'none' && role !== 'generic') ? 1 : 0
+    let isVisible = (role !== 'none' && role !== 'generic' && !node.ignored) ? 1 : 0
     // convirt isVisible to number
     node.depth = parent ? parent.depth + isVisible : 0
     let indent = ' '.repeat(node.depth)
@@ -99,10 +99,10 @@ async function prettyPrintNodes(nodes, outputFile) {
   if (!url.startsWith('https://')) {
     url = 'https://' + url
   }
-  await page.goto(url);
+  await page.goto(url, {waitUntil: 'networkidle2'});
   // sleep for 10 seconds
   if (!headless) {
-    await new Promise(resolve => setTimeout(resolve, 10 * 1000));
+    // await new Promise(resolve => setTimeout(resolve, 10 * 1000));
   }
 
   // replace all slashes with _ in url to make outputFIle
