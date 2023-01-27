@@ -1,5 +1,6 @@
 #!/usr/bin/env node --loader tsx
 import puppeteer, { Page } from 'puppeteer';
+import { promises as fs } from 'fs';
 
 /**
  * need to be able to resolve backendDOMNodeId, following trick should work
@@ -13,7 +14,11 @@ async function getAccessibilityTree(page) {
   ))
 }
 
-async function prettyPrintNodes(nodes) {
+function get_role(node) {
+  return node.role.value
+}
+async function prettyPrintNodes(nodes, outputFile) {
+  let output = ''
   let map = new Map<number, any>()
   for (let node of nodes) {
     let key = node.nodeId
@@ -29,13 +34,21 @@ async function prettyPrintNodes(nodes) {
     node.depth = parent ? parent.depth + 1 : 0
     let indent = ' '.repeat(node.depth)
     let childIds = node.childIds.map(x => parseInt(x))
-    let role = node.role.value
+    let role = get_role(node)
     let value = node.name ? node.name.value : ''
     if (role !== 'none' && role !== 'generic') {
+      let line = ''
       if (role === 'StaticText') {
-        console.log(`${indent}${JSON.stringify(value)}`)
+        line = `${indent}${JSON.stringify(value)}`
       } else {
-        console.log(`${indent}${role}`)// nodeId:${node.nodeId}`)
+        let properties = node.properties.map(x => `${x.name}:${x.value.value}`)
+        // figure out if this node has text
+        let hasStaticTextChild = childIds.map(x => get_role(map.get(x))).filter(x => x === 'StaticText').length > 0
+        let summary = (!hasStaticTextChild && value.length) ? JSON.stringify(value) : ''
+        line = `${indent}${role} ${summary} nodeId:${node.nodeId} ${properties}`
+      }
+      if (line.length) {
+        output += line + '\n'
       }
     }
     if (childIds.length) {
@@ -43,16 +56,27 @@ async function prettyPrintNodes(nodes) {
       // console.log(queue)
     }
   }
+  await fs.writeFile(outputFile, output)
 }
 
+/**
+ * TODO: connect to own browser via https://medium.com/@jaredpotter1/connecting-puppeteer-to-existing-chrome-window-8a10828149e0
+ */
 (async () => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ headless: false });
   const page: Page = await browser.newPage();
-  await page.goto('https://taras.glek.net');
+  await page.goto( process.argv[2]);
+  // replace all slashes with _ in url to make outputFIle
+  let outputFile = process.argv[2].replace('https://', '').replace(/\//g, '_')
   // console.log((page as any)._client);
   let tree = await getAccessibilityTree(page)
   // console.log(JSON.stringify(tree))
-  prettyPrintNodes(tree.nodes)
+  prettyPrintNodes(tree.nodes, outputFile + '.txt')
+  // pretty print tree.node into a .json file
+  let data = JSON.stringify(tree.nodes)
+  await fs.writeFile(outputFile + '.json', data)
   // console.log(await page.accessibility.snapshot());
+  // sleep for 60 seconds
+  // await new Promise(resolve => setTimeout(resolve, 60 * 1000));
   await browser.close();
 })();
