@@ -38,3 +38,9 @@ html with ARIA accessibility tree:
 ### Chrome extension that accesses page aria
 
 https://github.com/ziolko/aria-devtools
+
+tangent: hook up chrome extension to google sheets via oaut
+
+https://stackoverflow.com/questions/55477723/how-to-integrate-google-sheet-to-chrome-extension
+
+https://stackoverflow.com/questions/48335559/google-sheets-api-with-chrome-extension-how-to-use
