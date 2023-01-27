@@ -1,0 +1,10 @@
+{
+  "name": "aria-gpt",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.30.0",
+    "tsx": "^3.12.2"
+  }
+}
