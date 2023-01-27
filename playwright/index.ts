@@ -10,8 +10,14 @@ import { chromium } from 'playwright';
   if (1) {
     const client = await page.context().newCDPSession(page);
     const response = await client.send('Accessibility.getFullAXTree');
-  console.log(JSON.stringify(response.nodes));
+  console.log(JSON.stringify(response));
   } else {
   }
   await browser.close();
 })();
+
+/**
+ * Need to actually redo this using puppeteer
+ * need to be able to resolve backendDOMNodeId, following trick should work
+ *  https://github.com/puppeteer/puppeteer/issues/3641#issuecomment-655639166
+ */
