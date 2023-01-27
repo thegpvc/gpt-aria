@@ -1,13 +1,10 @@
 {
   "name": "aria-gpt",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "playwright": "^1.30.0",
+    "puppeteer": "^19.6.1",
     "tsx": "^3.12.2"
-  },
-  "devDependencies": {
-    "@types/node": "^18.11.18"
   }
 }
