@@ -16,12 +16,12 @@ export default class GPTDriver {
 //         console.log(prompt)
 
         const gptResponse = await this.openai.complete({
-            engine: "davinci",
+            engine: "text-davinci-002",
             prompt: prompt,
-            maxTokens: 16,
-            temperature: 0.2,
-            bestOf: 2,
-            n: 1
+            maxTokens: 50,
+            temperature: 0.5,
+            bestOf: 10,
+            n: 3
         });
 
         const rawCommand = gptResponse.data.choices[0].text;
