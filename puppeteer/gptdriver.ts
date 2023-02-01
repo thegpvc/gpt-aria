@@ -32,6 +32,8 @@ export default class GPTDriver {
     }
 
     private parseCommand(command: string): BaseCommand {
+        command = command.trim();
+
         if (command.startsWith("TYPESUBMIT")) {
             const origCommand = command;
             if (command.endsWith('"')) command = command.slice(0, -1);
@@ -50,6 +52,8 @@ export default class GPTDriver {
             let name = command.substring(nameIdx).trim();
 
             return new CommandClick(command, role, name);
+        } else if (command == "BINGO") {
+            return new CommandBingo(command);
         } else {
             throw new Error("unknown command " + command);
         }
