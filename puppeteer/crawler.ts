@@ -1,5 +1,5 @@
 import puppeteer, { Browser, ElementHandle, Page, SerializedAXNode } from "puppeteer";
-import { ContinueCommand, NextState } from "./command";
+import { ContinueCommand, NextState, AccessibilityTree } from "./command";
 
 export class Crawler {
     private browser: Browser;
@@ -24,10 +24,8 @@ export class Crawler {
     async parse(): Promise<string> {
         const tree = await this.getAccessibilityTree(this.page);
         this.ids = new Map<number, any>()
-        let tree_ret = this.simplifyTree(tree, {length_budget:2000})
-        // pretty-print to console
+        let tree_ret = this.simplifyTree(tree)
         let ret= JSON.stringify(tree_ret)
-        console.log(ret.length)
         return ret
     }
 
@@ -42,18 +40,16 @@ export class Crawler {
         return await page.accessibility.snapshot({ interestingOnly: true });
     }
 
-    private simplifyTree(node, budget:{length_budget:number}): any {
+    private simplifyTree(node): AccessibilityTree {
         let index = this.ids.size
         let e = [index, node.role, node.name]
-        budget.length_budget -= node.role.length + node.name.length
         this.ids.set(index, e)
-        let children = []
-        console.log("length_budget:"+budget.length_budget)
-        if (node.children && budget.length_budget > 0) {
+        let children = [] as AccessibilityTree[]
+        if (node.children) {
             const self = this;
-            children = node.children.map(child => self.simplifyTree(child, budget))
+            children = node.children.map(child => self.simplifyTree(child))
         }
-        return [...e, children]
+        return [index, node.role, node.name, children]
     }
 
     private async findElement(index:number): Promise<ElementHandle<Element>> {

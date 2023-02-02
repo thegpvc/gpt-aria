@@ -23,6 +23,9 @@ import { promises as fs } from "fs";
         let interaction = prompt + "\n////////////////////////////\n" + JSON.stringify(command)
         await fs.appendFile(fd, interaction)
         console.log(interaction)
+        if (command.result) {
+            process.exit(0)
+        }
         await crawler.handleCommand(command)
     } while (true);
 

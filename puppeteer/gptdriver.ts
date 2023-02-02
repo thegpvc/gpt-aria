@@ -8,8 +8,9 @@ export class GPTDriver {
     private openai = new OpenAI(process.env.OPENAI_API_KEY);
 
     async askCommand(objective: string, url: string, browserContent: string, previousCommand: string): Promise<[string, NextState]> {
-
-          //  browserContent = browserContent.slice(0, 2000);
+        let limit = 2000
+        if (browserContent.length > limit)
+            browserContent = browserContent.slice(0, limit);
 
         url = url.replace(/[?].*/g, "");
         let promptTemplate = await fs.readFile("command.ts", "utf8") +
@@ -19,7 +20,7 @@ export class GPTDriver {
           .replace('"$url"', JSON.stringify(url))
           .replace('"$output"}', '')
           // .replace("$previousCommand", previousCommand)
-          .replace('"$accessibility_tree"', browserContent).trim();
+          .replace('$accessibility_tree', ((browserContent))).trim();
         console.log(prompt)
         const gptResponse = await this.openai.complete({
             engine: "text-davinci-002",
@@ -30,10 +31,13 @@ export class GPTDriver {
             n: 3,
             stop: '\n'
         });
-        if (browserContent.length > 20000)
-          return [prompt, {result:"prompt too long"}];
 
         const response = gptResponse.data.choices[0].text;
-        return [prompt, JSON.parse(response)];
+        try {
+          return [prompt, JSON.parse(response)];
+        } catch (e) {
+          console.error("Invalid response: " + response)
+          throw e
+        }
     }
 }
