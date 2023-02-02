@@ -1,14 +1,11 @@
 #!/usr/bin/env node --loader tsx
 import { Crawler } from "./crawler";
-import GPTDriver, { CommandTypeSubmit, CommandClick, CommandBingo } from "./gptdriver.ts"
-// const readline = require("readline")
+import { GPTDriver, CommandTypeSubmit, CommandClick, CommandBingo } from "./gptdriver"
 
 (async () => {
     const objective = process.argv[2];
     const crawler = await Crawler.create();
     const gpt = new GPTDriver();
-
-//     const startUrl = "https://google.com/"
     const startUrl = "https://google.com/?hl=en"
     let previousCommand = "";
 

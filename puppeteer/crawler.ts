@@ -20,7 +20,7 @@ export class Crawler {
         return this.page.url();
     }
 
-    async parse(): string {
+    async parse(): Promise<string> {
         const tree = await this.getAccessibilityTree(this.page);
         return this.prettyPrintTree(tree)
     }
