@@ -7,13 +7,15 @@ export default class GPTDriver {
         if (browserContent.length > 2000)
             browserContent = browserContent.slice(0, 2000);
 
+        url = url.replace(/[?].*/g, "");
+
         let prompt = promptTemplate
             .replace("$browserContent", browserContent)
             .replace("$objective", objective)
             .replace("$url", url)
             .replace("$previousCommand", previousCommand);
 
-//         console.log(prompt)
+        console.log(prompt)
 
         const gptResponse = await this.openai.complete({
             engine: "text-davinci-002",
@@ -104,7 +106,7 @@ You can issue these commands:
 	TYPESUBMIT E "TEXT" - same as TYPE above, except then it presses ENTER to submit the form
 	BINGO - finish
 
-The format of the browser content is highly simplified; all formatting elements are stripped.
+The format of the browser content is a highly simplified accessibility tree; all formatting elements are stripped.
 Interactive elements such as links, inputs, buttons are represented like this:
 
 link About
@@ -117,10 +119,11 @@ Images are rendered as their alt text like this:
 img Google
 
 Based on your given objective, issue whatever command you believe will get you closest to achieving your goal.
+If there is a dialog asking about cookies, you should issue a command to click a button to accept all cookies.
+Like may look like "CLICK button Accept all". Accept all cookies before doing anything on the page.
+
 You always start on Google; you should submit a search query to Google that will take you to the best page for
 achieving your objective. And then interact with that page to achieve your objective.
-
-If on any page you see a dialog about cookies, accept all cookies by clicking an appropriate button.
 
 If you find yourself on Google and there are no search results displayed yet, you should probably issue a command
 like 'TYPESUBMIT combobox Search "search query"' to get to a more useful page.

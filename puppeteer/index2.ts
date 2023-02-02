@@ -4,19 +4,21 @@ import GPTDriver, { CommandTypeSubmit, CommandClick, CommandBingo } from "./gptd
 // const readline = require("readline")
 
 (async () => {
-    const objective = "find darth vader image with horns";
+    const objective = process.argv[2];
     const crawler = await Crawler.create();
     const gpt = new GPTDriver();
 
-//     const url = "https://google.com/"
-    const url = "https://google.com/?hl=en"
-
-    await crawler.goTo(url);
-
+//     const startUrl = "https://google.com/"
+    const startUrl = "https://google.com/?hl=en"
     let previousCommand = "";
+
+    await crawler.goTo(startUrl);
 
     do {
         const parsed = await crawler.parse();
+        const url = crawler.url().toString();
+
+        console.log(url);
         console.log(parsed);
 
         const command = await gpt.askCommand(objective, url, parsed, previousCommand)

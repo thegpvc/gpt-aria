@@ -16,6 +16,10 @@ export default class Crawler {
         await this.page.goto(url, { waitUntil: "networkidle2" });
     }
 
+    url(): string {
+        return this.page.url();
+    }
+
     async parse(): string {
         const tree = await this.getAccessibilityTree(this.page);
         return this.prettyPrintTree(tree)
