@@ -1,6 +1,6 @@
-import puppeteer from "puppeteer";
+import puppeteer, { Browser, ElementHandle, Page, SerializedAXNode } from "puppeteer";
 
-export default class Crawler {
+export class Crawler {
     private browser: Browser;
     private page: Page;
 
@@ -32,7 +32,7 @@ export default class Crawler {
         this.page = undefined;
     }
 
-    private async getAccessibilityTree(page: Page): SerializedAXNode | null {
+    private async getAccessibilityTree(page: Page): Promise<SerializedAXNode | null> {
         return await page.accessibility.snapshot({ interestingOnly: true });
     }
 
@@ -52,8 +52,12 @@ export default class Crawler {
         }
     }
 
-    private async findElement(role: string, name: String): ElementHandle {
-        return await this.page.$(`aria/${name}[role="${role}"]`);
+    private async findElement(role: string, name: String): Promise<ElementHandle<Element>> {
+        let ret = await this.page.$(`aria/${name}[role="${role}"]`);
+        if (!ret) {
+            throw new Error(`Could not find element with role ${role} and name ${name}`);
+        }
+        return ret
     }
 
     async type(role: string, name: String, text: string) {
@@ -72,13 +76,13 @@ export default class Crawler {
         await this.page.waitForNavigation({ waitUntil: "networkidle2" });
     }
 
-    private async resolveNodeFromBackendNodeId(frame, backendNodeId): ElementHandle {
+    private async resolveNodeFromBackendNodeId(frame, backendNodeId): Promise<ElementHandle<Element>> {
         const ctx = await Promise.resolve(frame.executionContext())
         console.log(ctx)
         return ctx._adoptBackendNodeId(backendNodeId)
     }
 
-    static async create(): Crawler {
+    static async create(): Promise<Crawler> {
         const crawler = new Crawler();
         await crawler.init();
         return crawler;

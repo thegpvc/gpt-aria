@@ -1,5 +1,5 @@
 #!/usr/bin/env node --loader tsx
-import Crawler from "./crawler.ts"
+import { Crawler } from "./crawler";
 import GPTDriver, { CommandTypeSubmit, CommandClick, CommandBingo } from "./gptdriver.ts"
 // const readline = require("readline")
 
