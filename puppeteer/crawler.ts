@@ -67,7 +67,6 @@ export class Crawler {
         command = command as ContinueCommand
         if (command.index !== undefined) {
             let e = await this.findElement(command.index)
-            console.log(e)
             e.type(command.params[0] as string + "\n")
         } else {
             throw new Error("Unknown command:"+ JSON.stringify(command));

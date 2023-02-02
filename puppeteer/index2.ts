@@ -22,8 +22,9 @@ import { promises as fs } from "fs";
         const [prompt, command] = await gpt.askCommand(objective, url, parsed, previousCommand)
         let interaction = prompt + "\n////////////////////////////\n" + JSON.stringify(command)
         await fs.appendFile(fd, interaction)
-        console.log(interaction)
+        // console.log(interaction)
         if (command.result) {
+            console.log(command.result)
             process.exit(0)
         }
         await crawler.handleCommand(command)

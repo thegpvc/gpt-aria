@@ -21,7 +21,6 @@ export class GPTDriver {
           .replace('"$output"}', '')
           // .replace("$previousCommand", previousCommand)
           .replace('$accessibility_tree', ((browserContent))).trim();
-        console.log(prompt)
         const gptResponse = await this.openai.complete({
             engine: "text-davinci-002",
             prompt: prompt,
