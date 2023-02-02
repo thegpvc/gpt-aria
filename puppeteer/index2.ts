@@ -27,9 +27,9 @@ import { promises as fs } from "fs";
         console.log(interaction)
 
         if (command instanceof CommandTypeSubmit) {
-            await crawler.typeSubmit(command.role, command.name, command.text);
+            await crawler.typeSubmit(command.id, command.text);
         } else if (command instanceof CommandClick) {
-            await crawler.click(command.role, command.name);
+            await crawler.click(command.id);
         } else if (command instanceof CommandBingo) {
             break;
         }

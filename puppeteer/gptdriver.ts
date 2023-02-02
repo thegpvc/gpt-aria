@@ -13,15 +13,16 @@ export class GPTDriver {
             .replace("$browserContent", browserContent)
             .replace("$objective", objective)
             .replace("$url", url)
-            .replace("$previousCommand", previousCommand).trim();
+            .replace("$previousCommand", previousCommand)
+            .trim();
 
         const gptResponse = await this.openai.complete({
             engine: "text-davinci-002",
             prompt: prompt,
             maxTokens: 50,
             temperature: 0.5,
-            bestOf: 10,
-            n: 3
+            bestOf: 1,
+            n: 1
         });
 
         const rawCommand = gptResponse.data.choices[0].text;
@@ -33,23 +34,14 @@ export class GPTDriver {
         command = command.trim();
 
         if (command.startsWith("TYPESUBMIT")) {
-            const origCommand = command;
-            if (command.endsWith('"')) command = command.slice(0, -1);
-            let roleIdx = command.indexOf(" ") + 1;
-            let nameIdx = command.indexOf(" ", roleIdx) + 1;
-            let textIdx = command.lastIndexOf('"') + 1;
-            let role = command.substring(roleIdx, nameIdx).trim();
-            let name = command.substring(nameIdx, textIdx - 1).trim();
-            let text = command.substring(textIdx).trim();
+            const id = parseInt(command.split(" ")[1]);
+            const text = command.split('"')[1];
 
-            return new CommandTypeSubmit(origCommand, role, name, text);
+            return new CommandTypeSubmit(command, id, text);
         } else if (command.startsWith("CLICK")) {
-            let roleIdx = command.indexOf(" ") + 1;
-            let nameIdx = command.indexOf(" ", roleIdx) + 1;
-            let role = command.substring(roleIdx, nameIdx).trim();
-            let name = command.substring(nameIdx).trim();
+            const id = parseInt(command.split(" ")[1]);
 
-            return new CommandClick(command, role, name);
+            return new CommandClick(command, id);
         } else if (command == "BINGO") {
             return new CommandBingo(command);
         } else {
@@ -65,8 +57,7 @@ export class BaseCommand {
 export class CommandTypeSubmit extends BaseCommand {
     constructor(
         raw: string,
-        public role: string,
-        public name: string,
+        public id: number,
         public text: string
     ) {
         super(raw);
@@ -76,8 +67,7 @@ export class CommandTypeSubmit extends BaseCommand {
 export class CommandClick extends BaseCommand {
     constructor(
         raw: string,
-        public role: string,
-        public name: string,
+        public id: number,
     ) {
         super(raw);
     }
@@ -97,34 +87,34 @@ You are an agent controlling a browser. You are given:
 	(3) a simplified text description of what's visible in the browser window (more on that below)
 
 You can issue these commands:
-	CLICK E - click on a given element E. You can only click on links, buttons, and inputs!
-	TYPE E "TEXT" - type the specified text into the input element E
+	CLICK E - click on a given element with id E. You can only click on links, buttons, and inputs!
+	TYPE E "TEXT" - type the specified text into the input element with id E
 	TYPESUBMIT E "TEXT" - same as TYPE above, except then it presses ENTER to submit the form
-	BINGO - finish
+	BINGO - objective reached
 
 The format of the browser content is a highly simplified accessibility tree; all formatting elements are stripped.
 Interactive elements such as links, inputs, buttons are represented like this:
 
-link About
-button Google apps
-combobox Search
-searchbox City, Address
+link 12 About
+button 1 Google apps
+combobox 42 Search
+searchbox 43 City, Address
 
 Images are rendered as their alt text like this:
 
-img Google
+img 42 Google
 
 Based on your given objective, issue whatever command you believe will get you closest to achieving your goal.
 If there is a dialog asking about cookies, you should issue a command to click a button to accept all cookies.
-Like may look like "CLICK button Accept all". Accept all cookies before doing anything on the page.
+Command may look like "CLICK 42". Accept all cookies before doing anything on the page.
 
 You always start on Google; you should submit a search query to Google that will take you to the best page for
 achieving your objective. And then interact with that page to achieve your objective.
 
 If you find yourself on Google and there are no search results displayed yet, you should probably issue a command
-like 'TYPESUBMIT combobox Search "search query"' to get to a more useful page.
+like 'TYPESUBMIT 9 "search query"' to get to a more useful page.
 
-Then, if you find yourself on a Google search results page, you might issue the command "CLICK X" where X should be
+Then, if you find yourself on a Google search results page, you might issue the command "CLICK X" where X should be a id of
 the first link or button from the search results. (If your previous command was a TYPESUBMIT your next command should
 probably be a CLICK.)
 
@@ -138,100 +128,100 @@ EXAMPLE 1:
 ==================
 CURRENT BROWSER CONTENT:
 ------------------
-RootWebArea Google
-  link About
-  link Store
-  link Gmail
-  link Images
-  button Google apps
-  link Sign in
-  img Google
-  combobox Search
-  button Search by voice
-  button Search by image
-  button Google Search
-  button I'm Feeling Lucky
-  link Advertising
-  link Business
-  link How Search works
-  link Carbon neutral since 2007
-  link Privacy
-  link Terms
-  button Settings
+RootWebArea 1 Google
+  link 2 About
+  link 3 Store
+  link 4 Gmail
+  link 5 Images
+  button 6 Google apps
+  link 7 Sign in
+  img 8 Google
+  combobox 9 Search
+  button 10 Search by voice
+  button 11 Search by image
+  button 12 Google Search
+  button 13 I'm Feeling Lucky
+  link 14 Advertising
+  link 15 Business
+  link 16 How Search works
+  link 17 Carbon neutral since 2007
+  link 18 Privacy
+  link 19 Terms
+  button 20 Settings
 ------------------
 OBJECTIVE: Find a 2 bedroom house for sale in Anchorage AK for under $750k
 CURRENT URL: https://www.google.com/
 YOUR COMMAND:
-TYPESUBMIT combobox Search "anchorage redfin"
+TYPESUBMIT 9 "anchorage redfin"
 ==================
 
 EXAMPLE 2:
 ==================
 CURRENT BROWSER CONTENT:
 ------------------
-RootWebArea Real Estate, Homes for Sale, MLS Listings, Agents | Redfin
-  button Redfin Homepage Link
-  link 1-844-759-7732
-  button Buy ▾
-    button Buy ▾
-  button Rent New ▾
-    button Rent New ▾
-  button Sell ▾
-    button Sell ▾
-  button Mortgage ▾
-    button Mortgage ▾
-  button Real Estate Agents ▾
-    link Real Estate Agents ▾
-  button Feed
-  button Log In
-  button Sign Up
-  heading Find homes first. Tour homes fast.
-  tab Buy
-  tab Rent
-  tab Sell
-  tab Mortgage
-  tab Home Estimate
-  generic
-    searchbox City, Address, School, Agent, ZIP
-    button submit search
-  StaticText Redfin supports fair housing. See the
-  link NY fair housing notice
+RootWebArea 1 Real Estate, Homes for Sale, MLS Listings, Agents | Redfin
+  button 2 Redfin Homepage Link
+  link 3 1-844-759-7732
+  button 4 Buy ▾
+    button 5 Buy ▾
+  button 6 Rent New ▾
+    button 7 Rent New ▾
+  button 8 Sell ▾
+    button 9 Sell ▾
+  button 10 Mortgage ▾
+    button 11 Mortgage ▾
+  button 12 Real Estate Agents ▾
+    link 13 Real Estate Agents ▾
+  button 14 Feed
+  button 15 Log In
+  button 16 Sign Up
+  heading 17 Find homes first. Tour homes fast.
+  tab 18 Buy
+  tab 19 Rent
+  tab 20 Sell
+  tab 21 Mortgage
+  tab 22 Home Estimate
+  generic 23
+    searchbox 24 City, Address, School, Agent, ZIP
+    button 25 submit search
+  StaticText 26 Redfin supports fair housing. See the
+  link 27 NY fair housing notice
 ------------------
 OBJECTIVE: Find a 2 bedroom house for sale in Anchorage AK for under $750k
 CURRENT URL: https://www.redfin.com/
 YOUR COMMAND:
-TYPESUBMIT searchbox City, Address, School, Agent, ZIP "Anchorage"
+TYPESUBMIT 24 "Anchorage"
 ==================
 
 EXAMPLE 3:
 ==================
 CURRENT BROWSER CONTENT:
 ------------------
-RootWebArea Google
-  link About
-  link Store
-  link Gmail
-  link Images
-  button Google apps
-  link Sign in
-  img Google
-  combobox Search
-  button Search by voice
-  button Search by image
-  button Google Search
-  button I'm Feeling Lucky
-  link Advertising
-  link Business
-  link How Search works
-  link Carbon neutral since 2007
-  link Privacy
-  link Terms
-  button Settings
+RootWebArea 1 Google
+  link 2 About
+  link 3 Store
+  link 4 Gmail
+  link 5 Images
+  button 6 Google apps
+  link 7 Sign in
+  img 8 Google
+  combobox 9 Search
+  button 10 Search by voice
+  button 11 Search by image
+  button 12 Google Search
+  button 13 I'm Feeling Lucky
+  link 14 Advertising
+  link 15 Business
+  link 16 How Search works
+  link 17 Carbon neutral since 2007
+  link 18 Privacy
+  link 19 Terms
+  button 20 Settings
 ------------------
 OBJECTIVE: Make a reservation for 4 at Dorsia at 8pm
 CURRENT URL: https://www.google.com/
 YOUR COMMAND:
-TYPESUBMIT combobox Search "dorsia nyc opentable"
+TYPESUBMIT 9 "dorsia nyc opentable"
 ==================
 
 The current browser content, objective, and current URL follow. Reply with your next command to the browser.
