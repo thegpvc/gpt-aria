@@ -3,7 +3,7 @@ const OpenAI = require('openai-api');
 export class GPTDriver {
     private openai = new OpenAI(process.env.OPENAI_API_KEY);
 
-    async askCommand(objective: string, url: string, browserContent: string, previousCommand: string): Promise<BaseCommand> {
+    async askCommand(objective: string, url: string, browserContent: string, previousCommand: string): Promise<[string, BaseCommand]> {
         if (browserContent.length > 2000)
             browserContent = browserContent.slice(0, 2000);
 
@@ -25,8 +25,8 @@ export class GPTDriver {
         });
 
         const rawCommand = gptResponse.data.choices[0].text;
-
-        return this.parseCommand(rawCommand);
+        let cmd = this.parseCommand(rawCommand)
+        return [prompt, cmd];
     }
 
     private parseCommand(command: string): BaseCommand {
