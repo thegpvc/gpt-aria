@@ -1,6 +1,6 @@
 #!/usr/bin/env node --loader tsx
 import { Crawler } from "./crawler";
-import { GPTDriver, CommandTypeSubmit, CommandClick, CommandBingo } from "./gptdriver"
+import { GPTDriver } from "./gptdriver"
 import { promises as fs } from "fs";
 
 (async () => {
@@ -20,19 +20,10 @@ import { promises as fs } from "fs";
         const url = crawler.url().toString();
 
         const [prompt, command] = await gpt.askCommand(objective, url, parsed, previousCommand)
-        previousCommand = command.raw;
-
-        let interaction = prompt + "\n----------------------------------------\n" + command.raw
+        let interaction = prompt + "\n////////////////////////////\n" + JSON.stringify(command)
         await fs.appendFile(fd, interaction)
         console.log(interaction)
-
-        if (command instanceof CommandTypeSubmit) {
-            await crawler.typeSubmit(command.role, command.name, command.text);
-        } else if (command instanceof CommandClick) {
-            await crawler.click(command.role, command.name);
-        } else if (command instanceof CommandBingo) {
-            break;
-        }
+        await crawler.handleCommand(command)
     } while (true);
 
 //     await crawler.close();
