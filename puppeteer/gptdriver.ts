@@ -19,12 +19,12 @@ export class GPTDriver {
     }
     async askCommand(prompt:string): Promise<GptResponse> {
         if (!process.env.OPENAI_API_KEY) {
-          throw new Error("OPENAI_API_KEY not set");
+          throw new Error("cat not set");
         }
         const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
         const gptResponse = await openai.complete({
-            engine: "text-davinci-002",
+            engine: "text-davinci-003",
             prompt: prompt,
             maxTokens: 50,
             temperature: 0.5,
