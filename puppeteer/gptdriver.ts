@@ -39,6 +39,8 @@ export class GPTDriver {
         } catch (e) {
           console.error("Invalid response: " + JSON.stringify(response))
           throw e
+        } finally {
+          console.log("GPT response: " + JSON.stringify(response))
         }
     }
 }

@@ -67,4 +67,5 @@ let sessionN = {
         ariaTreeJSON: `$ariaTreeJSON`,
         browserError: "$browserError"
     },
+    // keep JSON on single line, no newlines within string, ensure valid JSON
     outputJSON:"$output"}
