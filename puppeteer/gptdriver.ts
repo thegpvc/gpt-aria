@@ -24,7 +24,7 @@ export class GPTDriver {
         const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
         const gptResponse = await openai.complete({
-            engine: "text-davinci-003",
+            engine: "text-davinci-002",
             prompt: prompt,
             maxTokens: 50,
             temperature: 0.5,
