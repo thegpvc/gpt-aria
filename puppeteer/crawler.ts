@@ -12,7 +12,7 @@ export class Crawler {
 
     private async init() {
 //         this.browser = await puppeteer.launch({ headless: false, args: ["--proxy-server=socks5://localhost:5555"] });
-        this.browser = await puppeteer.launch({ headless: true });
+        this.browser = await puppeteer.launch({ headless: false });
         this.page = await this.browser.newPage();
     }
 

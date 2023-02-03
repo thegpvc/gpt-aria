@@ -7,7 +7,7 @@ import { promises as fs } from "fs";
     const objective = process.argv[2];
     const crawler = await Crawler.create();
     const gpt = new GPTDriver();
-    const startUrl = "https://google.com/?hl=en"
+    const startUrl = process.argv[3] || "https://google.com/?hl=en"
     const logFile = "log.txt"
     // open logFile for writing, replace existing contents if exist
     let fd = await fs.open(logFile, "w")
