@@ -1,0 +1,6 @@
+stateDiagram-v2
+    Objective --> GPT:{objective,url,aria-tree}
+    GPT-->Browser:cmd={element,params}
+    Browser --> GPT:{objective,url,aria-tree}
+    Browser --> GPT:{error,cmd,aria-tree}
+    GPT --> Summary

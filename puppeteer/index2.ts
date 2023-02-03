@@ -9,25 +9,27 @@ import { promises as fs } from "fs";
     const gpt = new GPTDriver();
     const startUrl = "https://google.com/?hl=en"
     const logFile = "log.txt"
-    let previousCommand = "";
     // open logFile for writing, replace existing contents if exist
     let fd = await fs.open(logFile, "w")
     console.log(`logging to ${logFile}`)
     await crawler.goTo(startUrl);
 
     do {
-        const parsed = await crawler.parse();
-        const url = crawler.url().toString();
-
-        const [prompt, command] = await gpt.askCommand(objective, url, parsed, previousCommand)
-        let interaction = prompt + "\n////////////////////////////\n" + JSON.stringify(command)
+        const state = await crawler.state(objective);
+        const prompt = await gpt.prompt(state)
+        let interaction = prompt + "\n////////////////////////////\n"
         await fs.appendFile(fd, interaction)
-        // console.log(interaction)
+        console.log(interaction)
+        const command = await gpt.askCommand(prompt)
+        interaction = JSON.stringify(command)
+        await fs.appendFile(fd, interaction)
+        console.log(command)
         if (command.result) {
             console.log(command.result)
             process.exit(0)
+        } else {
+            await crawler.transitionState(command)
         }
-        await crawler.handleCommand(command)
     } while (true);
 
 //     await crawler.close();
