@@ -28,9 +28,7 @@ export type BrowserState = {
 /** Function that controls the browser
   @returns the next command to issue to the browser
 */
-function browserNextDecision(input:BrowserState):BrowserCommand {
-    throw new Error("TODO")
-}
+declare function browserNextDecision(input:BrowserState):BrowserCommand
 
 /*
 Following contains inputs and expected outputs for the browserNext function
