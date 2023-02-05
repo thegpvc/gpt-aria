@@ -6,18 +6,19 @@ import OpenAI from 'openai-api'
 import { textSpanContainsPosition } from "typescript";
 import { BrowserState, GptResponse } from "./prompt";
 export class GPTDriver {
-    async prompt(state: BrowserState): Promise<string> {
+    async prompt(state: BrowserState): Promise<[string, string]> {
       let promptTemplate = await fs.readFile("prompt.ts", "utf8")
+      let prefix = '{"'
       let prompt = promptTemplate.trim()
           .replace("$objective", (state.objective))
           .replace("$url", (state.url))
-          .replace('"$output"}', '')
+          .replace('"$output"}', prefix)
           .replace('$ariaTreeJSON', state.ariaTreeJSON)
           .replace('"$browserError"', state.browserError ? JSON.stringify(state.browserError) : 'undefined')
           ;
-        return prompt
+        return [prompt, prefix]
     }
-    async askCommand(prompt:string): Promise<GptResponse> {
+    async askCommand(prompt:string, prefix: string): Promise<GptResponse> {
         if (!process.env.OPENAI_API_KEY) {
           throw new Error("cat not set");
         }
@@ -33,7 +34,7 @@ export class GPTDriver {
             stop: '\n'
         });
 
-        const response = gptResponse.data.choices[0].text;
+        const response = prefix + gptResponse.data.choices[0].text;
         try {
           return JSON.parse(response);
         } catch (e) {

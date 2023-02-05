@@ -4,7 +4,8 @@ import { GPTDriver } from "./gptdriver"
 import { promises as fs } from "fs";
 
 (async () => {
-    const objective = process.argv[2];
+    let objective = process.argv[2];
+    objective += ". Think on whether answer is relevant."
     const crawler = await Crawler.create();
     const gpt = new GPTDriver();
     const startUrl = process.argv[3] || "https://google.com/?hl=en"
@@ -16,11 +17,11 @@ import { promises as fs } from "fs";
 
     do {
         const state = await crawler.state(objective);
-        const prompt = await gpt.prompt(state)
+        const [prompt, prefix] = await gpt.prompt(state)
         let interaction = prompt + "\n////////////////////////////\n"
         await fs.appendFile(fd, interaction)
         console.log(interaction)
-        const command = await gpt.askCommand(prompt)
+        const command = await gpt.askCommand(prompt, prefix)
         interaction = JSON.stringify(command)
         await fs.appendFile(fd, interaction)
         console.log(command)
