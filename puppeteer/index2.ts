@@ -5,7 +5,7 @@ import { promises as fs } from "fs";
 
 (async () => {
     let objective = process.argv[2];
-    objective += ". Think on whether answer is relevant."
+    objective += ". Think on whether answer is relevant per ARIA tree."
     const crawler = await Crawler.create();
     const gpt = new GPTDriver();
     const startUrl = process.argv[3] || "https://google.com/?hl=en"
