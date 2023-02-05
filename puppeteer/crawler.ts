@@ -11,10 +11,16 @@ export class Crawler {
     private lastCommand?: BrowserCommand
 
     private async init() {
-//         this.browser = await puppeteer.launch({ headless: false, args: ["--proxy-server=socks5://localhost:5555"] });
-
         this.browser = await puppeteer.launch({ headless: "HEADLESS" in process.env });
         this.page = await this.browser.newPage();
+        let self = this
+        // this helps us work when links are opened in new tab
+        this.browser.on('targetcreated', async function(target){
+            let page = await target.page()
+            if (page) {
+                self.page = page
+            }
+        })
     }
 
     async state(objective: string, limit=2000): Promise<BrowserState> {

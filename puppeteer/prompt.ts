@@ -67,6 +67,17 @@ let session3 = {
     outputJSON: {"index": 15}
 }
 
+let session4 = {
+    input: {
+        objective: "buy me iphone 14 pro. Think on whether answer is relevant per ARIA tree.",
+        url: "https://www.google.com/search?q=iphone+14+pro",
+        ariaTreeJSON: `[0,"RootWebArea","iphone 14 pro - Google Shopping",[[1,"heading","Accessibility links"],[2,"link","Skip to main content"],[3,"link","Google"],[4,"combobox","Search",["iphone 14 pro"]],[5,"button","Clear",[[6,"button","Clear"]]],[7,"button","Search by voice"],[8,"button","Google Search"],[9,"button","Settings"],[10,"button","Google apps"],[11,"link","Sign in"],[12,"heading","Search modes"],[13,"link","All"],[14,"link","Images"],[15,"link","Maps"],"Shopping",[16,"button","More"],"Volyn Oblast",[17,"link","Learn more"],"Show only","","Price","","Broadband Generation","","Colour","","Storage Capacity","","Weight","","SIM Slots","","Cellular Network","","Security Features","","Rear Camera Resolution","","Screen Resolution","","Lens Quality","","RAM","","Lens Type","","Shipping & returns","","Product rating","",[18,"button","More Product rating"],"Condition","","Seller","",[19,"button","More Seller"],[20,"button","Sort by: Relevance"],"Ads","·",[21,"heading","See iphone 14 pro"],[22,"heading","More info"],[23,"link","Смартфон Apple iPhone 14 Pro 128Gb Deep Purple UAH 52,499.00 From Comfy"`,
+        browserError: undefined
+    },
+    // keep JSON on single line, no newlines within string, ensure valid JSON
+    outputJSON:{"index": 23}
+}
+
 // prompt //
 let sessionN = {
     input: {
