@@ -41,7 +41,6 @@ import { GptResponse } from "./prompt";
         log(debugChoices.join(""))
         let responseObj: GptResponse | undefined = undefined
         for (const choice of completions.data.choices) {
-            console.log(JSON.stringify([prefix , choice.text , suffix]))
             let response = prefix + choice.text + suffix
             try {
                 responseObj = JSON.parse(response)
