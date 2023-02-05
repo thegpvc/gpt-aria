@@ -23,7 +23,8 @@ import { GptResponse } from "./prompt";
     do {
         const state = await crawler.state(objective);
         const [prompt, prefix] = await gpt.prompt(state)
-        let interaction = prompt + "\n////////////////////////////\n"
+        let trimmed_prompt = prompt.split('// prompt //', 2)[1].trim()
+        let interaction = trimmed_prompt + "\n////////////////////////////\n"
         await log(interaction)
         const [completions, suffix] = await gpt.askCommand(prompt, prefix)
         // filter debug a bit

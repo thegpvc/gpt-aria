@@ -60,14 +60,14 @@ let session2 = {
 
 let session3 = {
     input: {
-        objective: "how much is an gadget 11 pro",
+        objective: "latest news on floods in bay area",
         url: "https://www.google.com/search",
         ariaTreeJSON: `[0,"RootWebArea","latest news on floods in bay area - Google Search",[[1,"heading","Accessibility links"],[2,"link","Skip to main content"],[3,"link","Accessibility help"],[4,"link","Accessibility feedback"],[5,"link","Google"],[6,"combobox","Search",["latest news on floods in bay area"]],[7,"button","Clear"],[8,"button","Search by voice"],[9,"button","Search by image"],[10,"button","Search"],[11,"button","Settings"],[12,"button","Google apps"],[13,"link","Sign in"],[14,"heading","Search modes"],"All",[15,"link","News"],[16,"link","Images"],[17,"link","Videos"],[18,"link","Books"],[19,"button","More"],[20,"button","Tools"],"About 21,000,000 results"," (0.52 seconds) ",[21,"heading","Ads"],[22,"link"," Breaking news, updated 24/7 - Local News Ad· https://www.rwcpulse.com/"],[23,"button","Why this ad?"],"Updated 24/7, including government, ","breaking news",", business updates, obituaries and more. Redwood City Pulse is your source for ","breaking"," local ","news",". Sign Up For E-Mail. See Events.","",[24,"link","Redwood City Local News"]," · ",[25,"link","Events Calendar"]," · ",[26,"link","News Releases"]," · ",[27,"link","Lasting Memories"]," · ",[28,"link","Blogs"],[29,"link"," San Francisco Unbiased News - Daily Non-Clickbait Briefing. Ad· https://www.join1440.com/san-francisco/news"],[30,"button","Why this ad?"],"We Scour 100+ Sources. Culture, Science, Sports, Politics, Business, And More. Join Today. We Scour 100+ Sources So You Don't Have To. All In A 5-Minute Read. 2.1 Million Readers. Subscribe Online. View Our Story.",[31,"link"," US flood hazard maps - Storm surge flood maps Ad· https://www.fathom.global/us"],[32,"button","Why this ad?"],"Fathom's US data is peer-reviewed, academic-led and the only real alternative to FEMA. Fathom partners deliver our world leading ","flood"," data to a wide variety of end users.","",[33,"link","Fathom US flood maps"]," · ",[34,"link","Research"]," · ",[35,"link","Fathom US CAT model"]`
     },
     outputJSON: {"index": 15}
 }
 
-// live example
+// prompt //
 let sessionN = {
     input: {
         objective: "$objective",
