@@ -63,6 +63,4 @@ import { GptResponse } from "./prompt";
             await crawler.transitionState(responseObj)
         }
     } while (true);
-
-//     await crawler.close();
 })();

@@ -36,9 +36,14 @@ export class Crawler {
             if (command.index !== undefined) {
                 let e = await this.findElement(command.index)
                 // cause text to get selected prior to replacing it(instead of appending)
-                e.click({ clickCount: 3 })
-                await new Promise(resolve => setTimeout(resolve, 100));
-                e.type(command.params[0] as string + "\n")
+                if (command.params) {
+                    e.click({ clickCount: 3 })
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    e.type(command.params[0] as string + "\n")
+                } else {
+                    e.click()
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
             } else {
                 throw new Error("Unknown command:"+ JSON.stringify(command));
             }
