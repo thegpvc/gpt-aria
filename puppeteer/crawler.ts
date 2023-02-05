@@ -76,7 +76,7 @@ export class Crawler {
         return await page.accessibility.snapshot({ interestingOnly: true });
     }
 
-    private simplifyTree(node): AccessibilityTree {
+    private simplifyTree(node: SerializedAXNode): AccessibilityTree {
         switch (node.role) {
             case "StaticText":
             case "generic":
@@ -93,6 +93,10 @@ export class Crawler {
         if (node.children) {
             const self = this;
             children = node.children.map(child => self.simplifyTree(child))
+        } else if (node.value) {
+            children = [node.value]
+        }
+        if (children.length) {
             e.push(children)
         }
         return e

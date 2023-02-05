@@ -10,7 +10,7 @@ export type BrowserCommand = {
 }
 
 export type GptSummary = {
-    result: string;
+    result: string; // Uses objective to form a full sentence response
 }
 
 export type GptResponse = BrowserCommand | GptSummary
@@ -32,11 +32,12 @@ declare function browserNextDecision(input:BrowserState):BrowserCommand
 
 /*
 Following contains inputs and expected outputs for the browserNext function
-Your code must obey the following constraints:
+Your outputJSON must obey the following constraints:
 1. only write valid code
-2. returnBrowserCommandJSON must be derived from input ariaTreeJSON in same session block
+2. outputJSON must be derived from input ariaTreeJSON in same session block
 3. Do not reuse info from other session blocks
-4. Do not solve objectives yourself, only let ariaTreeJSON guide you
+4. Do not solve objectives yourself, only let ariaTreeJSON be source for outputJSON
+5. When our outputJSON.params includes text, do not pass text that's already in the textbox as that will cause a loop.
 */
 let google_page = `[0,"RootWebArea","Google",[[1,"link","Gmail"],[2,"link","Images"],[3,"button","Google apps"],[4,"link","Sign in"],["img","Google"],[5,"combobox","Search"]`
 let session1 = {
@@ -45,7 +46,7 @@ let session1 = {
         url: "https://www.google.com/",
         ariaTreeJSON: google_page
     },
-    returnBrowserCommandJSON: {"index": 5, "params": ["gadget 11 pro price"]}
+    outputJSON: {"index": 5, "params": ["gadget 11 pro price"]}
 }
 
 let session2 = {
@@ -54,7 +55,7 @@ let session2 = {
         url: "https://www.google.com/search",
         ariaTreeJSON: `[0,"RootWebArea","gadget 99 MAX - Google Search",[[1,"heading","Accessibility Links"],[2,"link","Skip to main content"],[3,"link","Switch to page by page results"],[4,"link","Accessibility help"],[5,"link","Accessibility feedback"],[6,"link","Google"],[7,"combobox","Search"],[8,"button"," Clear"],[9,"button","Search by voice"],[10,"button","Search by image"],[11,"button","Search"],[12,"button","Settings"],[13,"button","Google apps"],[14,"link","Sign in"],[15,"heading","Search Modes"],"All",[16,"link","Shopping"],[17,"link","Images"],[18,"link","News"],[19,"link","Videos"],[20,"button","More"],[21,"button","Tools"],"About 242,000,000 results"," (0.70 seconds) ",[22,"heading","Ads"],[23,"heading","Ads·Shop gadget 99 MAX"],[24,"button","Why this ad?"],[25,"link","gadget 99 MAX Deep Purple - Unlocked eSIM - Vendor for $2,099.00 from Vendor"]`
     },
-    outputJSON: {"result": "gadget 99 MAX from Vendor for $2,099.00"}
+    outputJSON: {"result": "gadget 99 MAX from Vendor sells for $2,099.00."}
 }
 
 // live example

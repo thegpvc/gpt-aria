@@ -2,7 +2,7 @@
 import { promises as fs } from "fs";
 // rewrite as typescript
 // const OpenAI = require('openai-api');
-import OpenAI from 'openai-api'
+import OpenAI, { Completion } from 'openai-api'
 import { textSpanContainsPosition } from "typescript";
 import { BrowserState, GptResponse } from "./prompt";
 export class GPTDriver {
@@ -18,30 +18,27 @@ export class GPTDriver {
           ;
         return [prompt, prefix]
     }
-    async askCommand(prompt:string, prefix: string): Promise<GptResponse> {
+    async askCommand(prompt:string, prefix: string): Promise<[Completion, string]> {
         if (!process.env.OPENAI_API_KEY) {
           throw new Error("cat not set");
         }
         const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
-        const gptResponse = await openai.complete({
-            engine: "text-davinci-002",
+        const suffix = '}'
+        const completion = await openai.complete({
+            engine: "code-davinci-002",
             prompt: prompt,
             maxTokens: 50,
             temperature: 0.5,
             bestOf: 10,
             n: 3,
-            stop: '\n'
+            suffix: suffix,
+            stop: suffix,
+            // Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
+            // this helps a lot
+            // frequency_penalty:2,
         });
 
-        const response = prefix + gptResponse.data.choices[0].text;
-        try {
-          return JSON.parse(response);
-        } catch (e) {
-          console.error("Invalid response: " + JSON.stringify(response))
-          throw e
-        } finally {
-          console.log("GPT response: " + JSON.stringify(response))
-        }
+        return [completion,suffix];
     }
 }
