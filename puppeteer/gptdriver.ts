@@ -12,7 +12,7 @@ export class GPTDriver {
       let prompt = promptTemplate.trim()
           .replace("$objective", (state.objective))
           .replace("$url", (state.url))
-          .replace('"$output"}', prefix)
+          .replace('"$output"})', prefix)
           .replace('$ariaTreeJSON', state.ariaTreeJSON)
           .replace('"$browserError"', state.browserError ? JSON.stringify(state.browserError) : 'undefined')
           ;
