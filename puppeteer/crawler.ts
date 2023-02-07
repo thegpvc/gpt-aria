@@ -26,7 +26,7 @@ export class Crawler {
     async state(objective: string, limit=2000): Promise<BrowserState> {
         let contentJSON = await this.parseContent()
         let content: BrowserContentJSON = {
-            url: this.url(), // todo: should probably limit url too
+            url: this.url().replace(/[?].*/g, ""),
             ariaTreeJSON: contentJSON.substring(0, limit),
             objective: objective,
             error: this.error,
@@ -43,11 +43,11 @@ export class Crawler {
                 let e = await this.findElement(command.index)
                 // cause text to get selected prior to replacing it(instead of appending)
                 if (command.params) {
-                    e.click({ clickCount: 3 })
+                    await e.click({ clickCount: 3 })
                     await new Promise(resolve => setTimeout(resolve, 100));
-                    e.type(command.params[0] as string + "\n")
+                    await e.type(command.params[0] as string + "\n")
                 } else {
-                    e.click()
+                    await e.click()
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
             } else {
