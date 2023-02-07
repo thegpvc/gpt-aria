@@ -9,3 +9,6 @@ Running:
 * Run it starting custom start page: `./index2.ts "Whats the price of iphone 13 pro" https://www.apple.com/iphone/`
 
 Prompt lives in `prompt.ts`, log of execution is in `log.txt`
+
+
+Questions? https://discord.gg/jgWgkQvp
