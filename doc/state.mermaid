@@ -1,5 +1,5 @@
 stateDiagram-v2
-    Objective --> Browser:{objective,url,aria-tree}
+    Objective --> Browser:{objective}
     GPT-->Browser:cmd={element,params}
     Browser --> GPT:{objective,url,aria-tree}
     Browser --> GPT:{error,cmd,aria-tree}
