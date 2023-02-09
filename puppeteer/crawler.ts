@@ -1,6 +1,7 @@
 import puppeteer, { Browser, ElementHandle, Page, SerializedAXNode } from "puppeteer";
 import { ContinueCommand, NextState, AccessibilityTree } from "./command";
-import { BrowserCommand, BrowserContentJSON, BrowserState } from "./prompt";
+import { BrowserCommand, BrowserState } from "./prompt";
+import { MAIN_WORLD } from "puppeteer";
 
 export class Crawler {
     private browser: Browser;
@@ -11,7 +12,11 @@ export class Crawler {
     private lastCommand?: BrowserCommand
 
     private async init() {
-        this.browser = await puppeteer.launch({ headless: "HEADLESS" in process.env });
+        this.browser = await puppeteer.launch({
+            headless: "HEADLESS" in process.env,
+            userDataDir: "google-chrome",
+//             agrs: "--profile-directory=\"Profile 6\""
+        });
         this.page = await this.browser.newPage();
         let self = this
         // this helps us work when links are opened in new tab
@@ -23,10 +28,12 @@ export class Crawler {
         })
     }
 
-    async state(objective: string, limit=2000): Promise<BrowserState> {
+    async state(objective: string, steps: [string], currentStepIndex: number, limit=2000): Promise<BrowserState> {
         let contentJSON = await this.parseContent()
-        let content: BrowserContentJSON = {
+        let content: BrowserState = {
             url: this.url().replace(/[?].*/g, ""),
+            steps: steps,
+            currentStepIndex: currentStepIndex,
             ariaTreeJSON: contentJSON.substring(0, limit),
             objective: objective,
             error: this.error,
@@ -47,7 +54,9 @@ export class Crawler {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     await e.type(command.params[0] as string + "\n")
                 } else {
+                    console.log("x1")
                     await e.click()
+                    console.log("x2")
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
             } else {
@@ -56,6 +65,7 @@ export class Crawler {
             await this.page.waitForNavigation({ waitUntil: "networkidle2" });
         } catch (e) {
             this.error = e.toString()
+            console.log(this.error)
             this.lastCommand = command
         }
     }
@@ -113,13 +123,59 @@ export class Crawler {
         return e
     }
 
+    private async queryAXTree(
+      client: CDPSession,
+      element: ElementHandle<Node>,
+      accessibleName?: string,
+      role?: string
+    ): Promise<Protocol.Accessibility.AXNode[]> {
+      const {nodes} = await client.send('Accessibility.queryAXTree', {
+        objectId: element.remoteObject().objectId,
+        accessibleName,
+        role,
+      });
+      const filteredNodes: Protocol.Accessibility.AXNode[] = nodes.filter(
+        (node: Protocol.Accessibility.AXNode) => {
+          return !node.role || node.role.value !== 'StaticText';
+        }
+      );
+      return filteredNodes;
+    }
+
+    private async findElementXX(id: number): Promise<ElementHandle<Element>> {
+        const node = this.nodes[id];
+
+        let client = (this.page as any)._client();
+        const body = await this.page.$("body");
+        const res = await this.queryAXTree(client, body, node.name, node.role);
+        if (!res[0] || !res[0].backendDOMNodeId) {
+            throw new Error(`Could not find element with role ${node.role} and name ${node.name}`);
+        }
+        const backendNodeId = res[0].backendDOMNodeId;
+
+        return (await this.page.mainFrame().worlds[MAIN_WORLD].adoptBackendNode(backendNodeId)) as ElementHandle<Element>
+    }
+
     private async findElement(index:number): Promise<ElementHandle<Element>> {
         let e = this.idMapping.get(index)
         let role = e[1]
         let name = e[2]
-        let ret = await this.page.$(`aria/${name}[role="${role}"]`);
+
+        console.log(index + " " + role + " " + name)
+
+        let client = (this.page as any)._client();
+        const body = await this.page.$("body");
+        const res = await this.queryAXTree(client, body, name, role);
+        if (!res[0] || !res[0].backendDOMNodeId) {
+            throw new Error(`Could not find element with role ${node.role} and name ${node.name}`);
+        }
+        const backendNodeId = res[0].backendDOMNodeId;
+
+        const ret = (await this.page.mainFrame().worlds[MAIN_WORLD].adoptBackendNode(backendNodeId)) as ElementHandle<Element>
+
+//         let ret = await this.page.$(`aria/${name}[role="${role}"]`);
         if (!ret) {
-            throw new Error(`Could not find element with role ${role} and name ${name}`);
+            throw new Error(`Could not find element by backendNodeId with role ${role} and name ${name}`);
         }
         return ret
     }

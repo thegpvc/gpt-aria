@@ -6,22 +6,28 @@ import { GptResponse } from "./prompt";
 
 (async () => {
     let objective = process.argv[2];
-    objective += ". Think on whether answer is relevant per ARIA tree."
+    const objectiveARIA = objective + ". Think on whether answer is relevant per ARIA tree."
     const crawler = await Crawler.create();
     const gpt = new GPTDriver();
-    const startUrl = process.argv[3] || "https://google.com/?hl=en"
     const logFile = "log.txt"
     // open logFile for writing, replace existing contents if exist
     let fd = await fs.open(logFile, "w")
     console.log(`logging to ${logFile}`)
-    await crawler.goTo(startUrl);
     async function log(info) {
         await fs.appendFile(fd, info)
         console.log(info)
 
     }
+
+    const steps = await gpt.askPlan(objective);
+    log(steps);
+    const startUrl = process.argv[3] || "https://google.com/?hl=en"
+    await crawler.goTo(startUrl);
+    let currentStepIndex = 0;
+//     await new Promise(f => setTimeout(f, 3000000));
+
     do {
-        const state = await crawler.state(objective);
+        const state = await crawler.state(objectiveARIA, steps, currentStepIndex);
         const [prompt, prefix] = await gpt.prompt(state)
         let trimmed_prompt = prompt.split('// prompt //', 2)[1].trim()
         let interaction = trimmed_prompt + "\n////////////////////////////\n"
@@ -59,9 +65,16 @@ import { GptResponse } from "./prompt";
         await log(interaction)
         if (responseObj.result) {
             console.log(interaction.result)
-            process.exit(0)
+            await new Promise(f => setTimeout(f, 3000000));
+//             process.exit(0)
         } else {
+            currentStepIndex++;
             await crawler.transitionState(responseObj)
+
+//             if (currentStepIndex == 2)
+//                 await new Promise(f => setTimeout(f, 3000000));
         }
+
+        await new Promise(f => setTimeout(f, 3000));
     } while (true);
 })();
