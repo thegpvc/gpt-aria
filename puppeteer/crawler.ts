@@ -28,16 +28,14 @@ export class Crawler {
         })
     }
 
-    async state(objective: string, steps: [string], currentStepIndex: number, limit=2000): Promise<BrowserState> {
+    async state(objective: string, actionsSummary: string, limit=2000): Promise<BrowserState> {
         let contentJSON = await this.parseContent()
         let content: BrowserState = {
             url: this.url().replace(/[?].*/g, ""),
-            steps: steps,
-            currentStepIndex: currentStepIndex,
             ariaTreeJSON: contentJSON.substring(0, limit),
             objective: objective,
             error: this.error,
-            lastCommand: this.lastCommand
+            actionsSummary: actionsSummary
         }
         return content
     }
