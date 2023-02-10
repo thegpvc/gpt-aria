@@ -19,20 +19,19 @@ import { GptResponse } from "./prompt";
 
     }
 
-    const steps = await gpt.askPlan(objective);
-    log(steps);
     const startUrl = process.argv[3] || "https://google.com/?hl=en"
     await crawler.goTo(startUrl);
-    let currentStepIndex = 0;
-//     await new Promise(f => setTimeout(f, 3000000));
+    let actionsSummary = "";
 
     do {
-        const state = await crawler.state(objectiveARIA, steps, currentStepIndex);
+        const state = await crawler.state(objectiveARIA, actionsSummary);
         const [prompt, prefix] = await gpt.prompt(state)
         let trimmed_prompt = prompt.split('// prompt //', 2)[1].trim()
         let interaction = trimmed_prompt + "\n////////////////////////////\n"
         await log(interaction)
+//         await new Promise(f => setTimeout(f, 3000000));
         const [completions, suffix] = await gpt.askCommand(prompt, prefix)
+        console.log(completions.data.choices[0])
         // filter debug a bit
         let debugChoices = [] as string[]
         for (let choice of completions.data.choices) {
@@ -68,13 +67,10 @@ import { GptResponse } from "./prompt";
             await new Promise(f => setTimeout(f, 3000000));
 //             process.exit(0)
         } else {
-            currentStepIndex++;
-            await crawler.transitionState(responseObj)
-
-//             if (currentStepIndex == 2)
-//                 await new Promise(f => setTimeout(f, 3000000));
+            actionsSummary += ". " + responseObj.actionDescription;
+            await crawler.transitionState(responseObj.actionCommand)
         }
 
-        await new Promise(f => setTimeout(f, 3000));
+        await new Promise(f => setTimeout(f, 3000)); // because http 429
     } while (true);
 })();
