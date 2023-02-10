@@ -52,9 +52,7 @@ export class Crawler {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     await e.type(command.params[0] as string + "\n")
                 } else {
-                    console.log("x1")
                     await e.click()
-                    console.log("x2")
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
             } else {
