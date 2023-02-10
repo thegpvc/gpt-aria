@@ -15,7 +15,6 @@ export class Crawler {
         this.browser = await puppeteer.launch({
             headless: "HEADLESS" in process.env,
             userDataDir: "google-chrome",
-//             agrs: "--profile-directory=\"Profile 6\""
         });
         this.page = await this.browser.newPage();
         let self = this
@@ -58,7 +57,7 @@ export class Crawler {
             } else {
                 throw new Error("Unknown command:"+ JSON.stringify(command));
             }
-            await this.page.waitForNavigation({ waitUntil: "networkidle2" });
+            await this.page.waitForNavigation({ waitUntil: "networkidle0" });
         } catch (e) {
             this.error = e.toString()
             console.log(this.error)
