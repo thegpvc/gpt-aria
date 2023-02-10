@@ -57,7 +57,7 @@ export class Crawler {
             } else {
                 throw new Error("Unknown command:"+ JSON.stringify(command));
             }
-            await this.page.waitForNavigation({ waitUntil: "networkidle0" });
+            await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (e) {
             this.error = e.toString()
             console.log(this.error)
@@ -66,7 +66,8 @@ export class Crawler {
     }
 
     async goTo(url: string) {
-        await this.page.goto(url, { waitUntil: "networkidle2" });
+        await this.page.goto(url);
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     url(): string {
