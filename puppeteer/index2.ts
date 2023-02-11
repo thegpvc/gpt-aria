@@ -63,9 +63,9 @@ import { GptResponse } from "./prompt";
         objectiveProgress.push(responseObj.actionDescription);
         interaction = JSON.stringify(responseObj)
         await log(interaction)
-        if (responseObj.result) {
+        if (responseObj.actionCommand.result) {
             console.log(objectiveProgress.join("\n"))
-            console.log(interaction.result)
+            console.log(responseObj.actionCommand.result)
             process.exit(0)
         } else {
             await crawler.transitionState(responseObj.actionCommand)
