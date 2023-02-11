@@ -23,7 +23,7 @@ export type ObjectiveState = {
  /** Function that controls the browser
   @returns the next ActionStep
  */
- declare function assertActionStepNext(input_output:{objectivestate:BrowserState, actionstep:GptResponse})
+ declare function assertNextActionStep(input_output:{objectivestate:ObjectiveState, actionstep:ActionStep})
  /*
  For each assertActionNextStep function below, use information from the ObjectiveState within that function only to complete the ActionStep within that function.Only write valid code.
  */
@@ -71,7 +71,7 @@ export type ObjectiveState = {
  
 
 // prompt //
- assertBrowserNextDecision({
+assertNextActionStep({
     objectivestate: {
         objectivePrompt: "$objective",
         objectiveProgress: `$actionsSummary`,
