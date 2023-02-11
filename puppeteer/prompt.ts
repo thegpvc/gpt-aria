@@ -38,7 +38,8 @@ export type ObjectiveState = {
         progressAssessment: "Do not yet have enough information to return an Objective Response",
         actionPlan:"Search `gadget 11 pro price`",
         actionCommand: {"index": 5, "params": ["gadget 11 pro price"]},
-        actionDescription: "Googled gadget 11 pro price"}
+        actionDescription: "Googled gadget 11 pro price"
+    }
  })
 
  assertNextActionStep({
@@ -52,7 +53,8 @@ export type ObjectiveState = {
         progressAssessment: "Googled when Early Voting won Preakness Stakes",
         actionPlan:"ariaTree indicates Early Voting won Preakness Stakes in 2022 and the current url is google.com, so as a next step search `2022 president`",
         actionCommand: {"index": 7, "params": ["2022 president"]},
-        actionDescription: "Early Voting won Preakness Stakes in 2022, so googled `2022 president`"}
+        actionDescription: "Early Voting won Preakness Stakes in 2022, so googled `2022 president`"
+    }
  })
 
  assertNextActionStep({
@@ -66,7 +68,8 @@ export type ObjectiveState = {
         progressAssessment: "Googled when Ted Kennedy was born",
         actionPlan:"Look for answer in ariaTree, select best link if confidence is low",
         actionCommand: {"result": "Ted Kennedy was born on February 22, 1932."},
-        actionDescription: "Returned a result for the objectivePrompt"}
+        actionDescription: "Returned a result for the objectivePrompt"
+    }
  })
 
 
