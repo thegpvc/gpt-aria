@@ -49,7 +49,7 @@ export type ObjectiveState = {
     actionstep: {
         "progressAssessment": "Per search results in ariaTree: Early Voting won Preakness Stakes in 2022. Do not have enough information to return objective result. Now need to find out who was president in 2022",
         "actionCommand": {"index": 7, "params": ["2022 president"]},
-        "actionDescription": "per ariaTree: Early Voting won Preakness Stakes in 2022, so searched `2022 president`"
+        "actionDescription": "per ariaTree: Early Voting won Preakness Stakes in 2022. This is a partial answer to `early voting Preakness Stakes win` so searched `2022 president`"
     }})
 
  assertNextActionStep({
@@ -62,7 +62,7 @@ export type ObjectiveState = {
     actionstep: {
         "progressAssessment": "Per search results in ariaTree: Ted Kennedy was born on February 22, 1932, returning Objective result.",
         "actionCommand": {"result": "Ted Kennedy was born on February 22, 1932."},
-        "actionDescription": "Returned a result for the objective using info in ariaTree"
+        "actionDescription": "According to ariaTree Ted Kennedy was born on February 22, 1932. This is a reasonable response to `When was Ted Kennedy Born` in objectivePrompt."
     }})
 
 // prompt //

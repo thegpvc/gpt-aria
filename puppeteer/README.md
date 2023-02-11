@@ -12,3 +12,6 @@ Prompt lives in `prompt.ts`, log of execution is in `log.txt`
 
 
 Questions? https://discord.gg/jgWgkQvp
+
+Sample queries:
+* who was president when first starwars was released?
