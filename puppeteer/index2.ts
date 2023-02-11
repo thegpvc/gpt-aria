@@ -64,7 +64,12 @@ import { GptResponse } from "./prompt";
         interaction = JSON.stringify(responseObj)
         await log(interaction)
         if (responseObj.actionCommand.result) {
+            console.log("Objective:" + objective)
+            console.log("Objective Progress:")
             console.log(objectiveProgress.join("\n"))
+            console.log("Progress Assessment:")
+            console.log(responseObj.progressAssessment)
+            console.log("Result:")
             console.log(responseObj.actionCommand.result)
             process.exit(0)
         } else {
