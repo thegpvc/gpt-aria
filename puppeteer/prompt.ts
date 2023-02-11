@@ -49,7 +49,7 @@ export type ObjectiveState = {
     actionstep: {
         "progressAssessment": "Per search results in ariaTree: Early Voting won Preakness Stakes in 2022. Do not have enough information to return objective result. Now need to find out who was president in 2022",
         "actionCommand": {"index": 7, "params": ["2022 president"]},
-        "actionDescription": "per ariaTree: Early Voting won Preakness Stakes in 2022. This is a partial answer to `early voting Preakness Stakes win` so searched `2022 president`"
+        "actionDescription": "Early Voting won Preakness Stakes on `May 21, 2022`. This is a partial answer to `early voting Preakness Stakes win` so searched `2022 president`"
     }})
 
  assertNextActionStep({
@@ -57,12 +57,12 @@ export type ObjectiveState = {
         objectivePrompt: "When was Ted Kennedy Born",
         objectiveProgress: ["Searched `Ted Kennedy born`"],
         url: "https://www.google.com/",
-        ariaTree: `[0,"RootWebArea","Google",[[1,"link","About"],[2,"link","Store"],[3,"link","Gmail"],[4,"link","Search for Images"],[5,"button","Google apps"],[6,"link","Sign in"],["img","Google"],[7,"combobox","Search"],[8,"button","Search by voice"],[9,"button","Search by image"],[10,"button","Google Search"],[11,"button","I'm Feeling Lucky"],[12,"link","Advertising"],[13,"link","Business"],[14,"link","How Search works"],[15,"link","Carbon neutral since 2007"],[16,"link","Privacy"],[17,"link","Terms"],[18,"button","Settings"]]]`
+        ariaTree: `[0,"RootWebArea","Ted Kennedy born - Google Search",[[1,"heading","Accessibility Links"],[2,"link","Skip to main content"],[3,"link","Switch to page by page results"],[4,"link","Accessibility help"],[5,"link","Accessibility feedback"],[6,"link","Google"],[7,"combobox","Search",["Ted Kennedy born"]],[8,"button"," Clear"],[9,"button","Search by voice"],[10,"button","Search by image"],[11,"button","Search"],[12,"button","Settings"],[13,"button","Google apps"],[14,"link","Sign in"],[15,"heading","Search Modes"],"All",[16,"link","Images"],[17,"link","News"],[18,"link","Videos"],[19,"link","Shopping"],[20,"button","More"],[21,"button","Tools"],"About 13,200,000 results"," (0.50 seconds) ",[22,"heading","Search Results"],[23,"heading","Ted Kennedy/Born"],[24,"link","February 22, 1932, Dorchester, Boston, MA"],[25,"button","Image result for Ted Kennedy born"],[26,"button","Feedback"],[27,"link"," Ted Kennedy - Wikipedia https://en.wikipedia.org › wiki › Ted_Kennedy"],[28,"button","About this result"],"Edward Moore Kennedy (","February 22, 1932 – August 25, 2009",") was an American lawyer`
     },
     actionstep: {
         "progressAssessment": "Per search results in ariaTree: Ted Kennedy was born on February 22, 1932, returning Objective result.",
         "actionCommand": {"result": "Ted Kennedy was born on February 22, 1932."},
-        "actionDescription": "According to ariaTree Ted Kennedy was born on February 22, 1932. This is a reasonable response to `When was Ted Kennedy Born` in objectivePrompt."
+        "actionDescription": "Ted Kennedy was born on `February 22, 1932` according to search results. This is a reasonable answer to `When was Ted Kennedy Born` in objectivePrompt."
     }})
 
 // prompt //
