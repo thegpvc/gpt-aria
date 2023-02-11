@@ -10,14 +10,14 @@ import { backOff, BackoffOptions } from "exponential-backoff";
 export class GPTDriver {
     async prompt(state: BrowserState): Promise<[string, string]> {
       let promptTemplate = await fs.readFile("prompt.ts", "utf8")
-      let prefix = '{"'
+      let prefix = '{"progressAssessment":'
       let prompt = promptTemplate.trim()
           .replace("$objective", (state.objectivePrompt))
           .replace("$url", (state.url))
-          .replace('"$output"})', prefix)
+          .replace('"$output"}})', '')
           .replace('$ariaTreeJSON', state.ariaTree)
           .replace('"$browserError"', state.browserError ? JSON.stringify(state.browserError) : 'undefined')
-          .replace('$actionsSummary', state.objectiveProgress)
+          .replace('["$objectiveProgress"]', JSON.stringify(state.objectiveProgress))
           ;
         return [prompt, prefix]
     }

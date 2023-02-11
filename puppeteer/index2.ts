@@ -6,12 +6,13 @@ import { GptResponse } from "./prompt";
 
 (async () => {
     let objective = process.argv[2];
-    const objectiveARIA = objective + ". Think on whether answer is relevant per ARIA tree."
+    const objectiveARIA = objective
     const crawler = await Crawler.create();
     const gpt = new GPTDriver();
     const logFile = "log.txt"
     // open logFile for writing, replace existing contents if exist
     let fd = await fs.open(logFile, "w")
+    // let objectiveProgress = [] as string[]
     console.log(`logging to ${logFile}`)
     async function log(info) {
         await fs.appendFile(fd, info)
@@ -21,10 +22,9 @@ import { GptResponse } from "./prompt";
 
     const startUrl = process.argv[3] || "https://google.com/?hl=en"
     await crawler.goTo(startUrl);
-    let actionsSummary = "";
-
+    let objectiveProgress = [] as string[];
     do {
-        const state = await crawler.state(objectiveARIA, actionsSummary);
+        const state = await crawler.state(objectiveARIA, objectiveProgress);
         const [prompt, prefix] = await gpt.prompt(state)
         let trimmed_prompt = prompt.split('// prompt //', 2)[1].trim()
         let interaction = trimmed_prompt + "\n////////////////////////////\n"
@@ -60,14 +60,14 @@ import { GptResponse } from "./prompt";
             console.error("Did not receive a valid response")
             process.exit(1)
         }
+        objectiveProgress.push(responseObj.actionDescription);
         interaction = JSON.stringify(responseObj)
         await log(interaction)
         if (responseObj.result) {
+            console.log(objectiveProgress.join("\n"))
             console.log(interaction.result)
-            await new Promise(f => setTimeout(f, 3000000));
-//             process.exit(0)
+            process.exit(0)
         } else {
-            actionsSummary += ". " + responseObj.actionDescription;
             await crawler.transitionState(responseObj.actionCommand)
         }
     } while (true);
