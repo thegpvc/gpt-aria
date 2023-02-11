@@ -5,17 +5,19 @@ import { promises as fs } from "fs";
 import OpenAI, { Completion } from 'openai-api'
 import { textSpanContainsPosition } from "typescript";
 import { BrowserState, GptResponse } from "./prompt";
+import { backOff, BackoffOptions } from "exponential-backoff";
+
 export class GPTDriver {
     async prompt(state: BrowserState): Promise<[string, string]> {
       let promptTemplate = await fs.readFile("prompt.ts", "utf8")
       let prefix = '{"'
       let prompt = promptTemplate.trim()
-          .replace("$objective", (state.objective))
+          .replace("$objective", (state.objectivePrompt))
           .replace("$url", (state.url))
           .replace('"$output"})', prefix)
-          .replace('$ariaTreeJSON', state.ariaTreeJSON)
+          .replace('$ariaTreeJSON', state.ariaTree)
           .replace('"$browserError"', state.browserError ? JSON.stringify(state.browserError) : 'undefined')
-          .replace('$actionsSummary', state.actionsSummary)
+          .replace('$actionsSummary', state.objectiveProgress)
           ;
         return [prompt, prefix]
     }
@@ -26,7 +28,13 @@ export class GPTDriver {
         const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
         const suffix = '"}'
-        const completion = await openai.complete({
+        const backOffOptions: BackoffOptions = {
+            retry: (e: any, attemptNumber: number) => {
+                console.log("retrying openai.complete error " + e)
+                return true;
+            }
+        }
+        const completion = await backOff(() => openai.complete({
             engine: "code-davinci-002",
             prompt: prompt,
             maxTokens: 256,
@@ -38,7 +46,7 @@ export class GPTDriver {
             // Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
             // this helps a lot
             // frequency_penalty:2,
-        });
+        }), backOffOptions);
 
         return [completion,suffix];
     }
