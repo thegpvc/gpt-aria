@@ -27,7 +27,7 @@ export class GPTDriver {
         }
         const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
-        const suffix = '"}'
+        const suffix = '})'
         const backOffOptions: BackoffOptions = {
             retry: (e: any, attemptNumber: number) => {
                 console.log("retrying openai.complete error " + e)
