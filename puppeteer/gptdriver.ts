@@ -29,24 +29,27 @@ export class GPTDriver {
 
         const suffix = '})'
         const backOffOptions: BackoffOptions = {
+            delayFirstAttempt: false,
             retry: (e: any, attemptNumber: number) => {
-                console.log("retrying openai.complete error " + e)
+                console.log(`Retry #${attemptNumber} after openai.complete error ${e}`)
                 return true;
             }
         }
-        const completion = await backOff(() => openai.complete({
-            engine: "code-davinci-002",
-            prompt: prompt,
-            maxTokens: 256,
-            temperature: 0.5,
-            bestOf: 10,
-            n: 3,
-            suffix: suffix,
-            stop: suffix,
-            // Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
-            // this helps a lot
-            // frequency_penalty:2,
-        }), backOffOptions);
+        const completion = await backOff(() => {
+            return openai.complete({
+                engine: "code-davinci-002",
+                prompt: prompt,
+                maxTokens: 256,
+                temperature: 0.5,
+                bestOf: 10,
+                n: 3,
+                suffix: suffix,
+                stop: suffix,
+                // Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
+                // this helps a lot
+                // frequency_penalty:2,
+            })
+        }, backOffOptions);
 
         return [completion,suffix];
     }
