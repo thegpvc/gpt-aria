@@ -8,6 +8,8 @@ import { BrowserState, GptResponse } from "./prompt";
 import { backOff, BackoffOptions } from "exponential-backoff";
 
 export class GPTDriver {
+    private lastAttemptCount = 0
+
     async prompt(state: BrowserState): Promise<[string, string]> {
       let promptTemplate = await fs.readFile("prompt.ts", "utf8")
       let prefix = '{"progressAssessment":'
@@ -28,9 +30,13 @@ export class GPTDriver {
         const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
         const suffix = '})'
+        let self = this
         const backOffOptions: BackoffOptions = {
-            delayFirstAttempt: false,
+            // try to delay the first attempt if we had fails in previous runs
+            delayFirstAttempt: !!this.lastAttemptCount,
+            startingDelay: (Math.max(0, this.lastAttemptCount - 1) + 1) * 100,
             retry: (e: any, attemptNumber: number) => {
+                self.lastAttemptCount = attemptNumber
                 console.log(`Retry #${attemptNumber} after openai.complete error ${e}`)
                 return true;
             }

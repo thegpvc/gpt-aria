@@ -65,6 +65,19 @@ export type ObjectiveState = {
         "actionDescription": "Ted Kennedy was born on `February 22, 1932` according to search results. This is a reasonable answer to `When was Ted Kennedy Born` in objectivePrompt."
     }})
 
+assertNextActionStep({
+    objectivestate: {
+        objectivePrompt: "",
+        objectiveProgress: [],
+        url: "https://www.google.com/",
+        ariaTree: `[0,"RootWebArea","Google",[[1,"dialog","Before you continue to Google Search",[["img","Google"],[2,"button","Choose language, en"],[3,"link","Sign in"],[4,"heading","Before you continue to Google"],"We use ",[5,"link","cookies"]," and data to","Deliver and maintain Google services","Track outages can also include more relevant results, recommendations and tailored ads based on past activity from this browser, like previous Google searches. We also use cookies and data to tailor the experience to be age-appropriate, if relevant.","Select 'More options' to see additional information, including details about managing your privacy settings. You can also visit ","g.co/privacytools"," at any time.",[6,"button","Reject all"],[7,"button","Accept all"],[8,"link","More options",["More options"]],[9,"link","Privacy"],[10,"link","Terms"]]]]]`,
+    },
+    actionstep: {
+        "progressAssessment": "Content in ariaTree wants me to accept terms. I will click accept when nothing more relevant to click.",
+        "actionCommand": {"index" : 7},
+        "actionDescription": "Clicked Accept"
+    }})
+
 // prompt //
 assertNextActionStep({
     objectivestate: {

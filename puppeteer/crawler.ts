@@ -27,7 +27,7 @@ export class Crawler {
         })
     }
 
-    async state(objective: string, objectiveProgress: string[], limit=2000): Promise<ObjectiveState> {
+    async state(objective: string, objectiveProgress: string[], limit=4000): Promise<ObjectiveState> {
         let contentJSON = await this.parseContent()
         let content: ObjectiveState = {
             url: this.url().replace(/[?].*/g, ""),
