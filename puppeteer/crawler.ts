@@ -1,6 +1,6 @@
 import puppeteer, { Browser, ElementHandle, Page, SerializedAXNode } from "puppeteer";
 import { ContinueCommand, NextState, AccessibilityTree } from "./command";
-import { BrowserCommand, BrowserState } from "./prompt";
+import { BrowserCommand, ObjectiveState } from "./prompt";
 import { MAIN_WORLD } from "puppeteer";
 
 export class Crawler {
@@ -15,7 +15,6 @@ export class Crawler {
         this.browser = await puppeteer.launch({
             headless: "HEADLESS" in process.env,
             userDataDir: "google-chrome",
-//             agrs: "--profile-directory=\"Profile 6\""
         });
         this.page = await this.browser.newPage();
         let self = this
@@ -30,12 +29,12 @@ export class Crawler {
 
     async state(objective: string, actionsSummary: string, limit=2000): Promise<BrowserState> {
         let contentJSON = await this.parseContent()
-        let content: BrowserState = {
+        let content: ObjectiveState = {
             url: this.url().replace(/[?].*/g, ""),
-            ariaTreeJSON: contentJSON.substring(0, limit),
-            objective: objective,
-            error: this.error,
-            actionsSummary: actionsSummary
+            ariaTree: contentJSON.substring(0, limit),
+            objectiveProgress: actionsSummary,
+//             error: this.error,
+            objectivePrompt: objective
         }
         return content
     }
@@ -52,15 +51,13 @@ export class Crawler {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     await e.type(command.params[0] as string + "\n")
                 } else {
-                    console.log("x1")
                     await e.click()
-                    console.log("x2")
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
             } else {
                 throw new Error("Unknown command:"+ JSON.stringify(command));
             }
-            await this.page.waitForNavigation({ waitUntil: "networkidle2" });
+            await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (e) {
             this.error = e.toString()
             console.log(this.error)
@@ -69,7 +66,8 @@ export class Crawler {
     }
 
     async goTo(url: string) {
-        await this.page.goto(url, { waitUntil: "networkidle2" });
+        await this.page.goto(url);
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     url(): string {

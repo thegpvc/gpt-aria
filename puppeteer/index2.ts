@@ -70,7 +70,5 @@ import { GptResponse } from "./prompt";
             actionsSummary += ". " + responseObj.actionDescription;
             await crawler.transitionState(responseObj.actionCommand)
         }
-
-        await new Promise(f => setTimeout(f, 3000)); // because http 429
     } while (true);
 })();

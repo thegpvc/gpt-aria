@@ -7,11 +7,11 @@ export type ObjectiveState = {
     ariaTree: string //JSON of ariaTree for url in format [index, role, name, [children]]
  }
  export type BrowserAction = {
-    index: number // index for ariaTree element
+    index: number, // index for ariaTree element
     params?: string[] // input for combobox, textbox, or searchbox elements
  }
  export type ObjectiveResponse = {
-    result: string; // response to objectivePrompt in conversational tone
+    result: string // response to objectivePrompt in conversational tone
  }
  export type GptResponse = BrowserAction | ObjectiveResponse  // either the next browser action or a final response to the objectivePrompt
  export type ActionStep = {
@@ -23,7 +23,7 @@ export type ObjectiveState = {
  /** Function that controls the browser
   @returns the next ActionStep
  */
- declare function assertActionStepNext(input_output:{input:BrowserState, outputJSON:GptResponse})
+ declare function assertActionStepNext(input_output:{objectivestate:BrowserState, actionstep:GptResponse})
  /*
  For each assertActionNextStep function below, use information from the ObjectiveState within that function only to complete the ActionStep within that function.Only write valid code.
  */
@@ -69,13 +69,13 @@ export type ObjectiveState = {
         actionDescription: "Returned a result for the objectivePrompt"}
  })
  
- actionCommand:{"result": "gadget 11 Pro from Vendor sells for €479"},
- 
+
+// prompt //
  assertBrowserNextDecision({
-    input: {
+    objectivestate: {
         objectivePrompt: "$objective",
         objectiveProgress: `$actionsSummary`,
         url: "$url",
-        aria: `$ariaTreeJSON`,
+        ariaTree: `$ariaTreeJSON`,
     },
     actionstep:"$output"})

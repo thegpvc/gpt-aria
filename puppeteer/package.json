@@ -6,6 +6,7 @@
   "dependencies": {
     "puppeteer": "^19.6.1",
     "tsx": "^3.12.2",
-    "openai-api": "1.3.1"
+    "openai-api": "1.3.1",
+    "exponential-backoff": "^3.1.0"
   }
 }
