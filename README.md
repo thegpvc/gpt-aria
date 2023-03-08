@@ -24,6 +24,16 @@ Sample queries:
 * Multiple completions are an interesting signal of the model's certainty
 * Shoveling in a lot of context can be done via code, this eliminates a lot of validation work, avoids having to specify serialization/rpc strategy.
 
+
+```mermaid
+stateDiagram-v2
+    Objective --> Browser:{objective}
+    GPT-->Browser:cmd={element,params}
+    Browser --> GPT:{objective,url,aria-tree}
+    Browser --> GPT:{error,cmd,aria-tree}
+    GPT --> Summary
+```
+
 ## Using chrome accessibility tree to turn the web into a textual interface and access it like a user of a screen-reader
 
 **Marketing Goal**: to produce a content-marketing blog post like: https://dagster.io/blog/chatgpt-langchain
