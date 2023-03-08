@@ -10,12 +10,14 @@ import yargs from 'yargs/yargs';
         objective: { type: 'string', demandOption: true, description: 'Natural language objective for gpt-aria to complete' },
         "start-url": { default: 'https://google.com/?hl=en' },
         "log-output": { default: 'log.txt' },
+        "openai-api-key": { type: 'string', default: process.env.OPENAI_API_KEY , demandOption: true, description: 'OpenAI.com API key. Can also be set via OPENAI_API_KEY environment variable'},
+        "headless": { type: 'boolean', default: false, description: 'Run in headless mode (no browser window)' },
         }).
         usage('Usage: $0 --objective <objective> [--start-url <url-to-visit-first>]').
         parseSync();
 
-    const crawler = await Crawler.create();
-    const gpt = new GPTDriver();
+    const crawler = await Crawler.create(argv.headless);
+    const gpt = new GPTDriver(argv["openai-api-key"]!);
     const logFile = "log.txt"
     let fd = await fs.open(logFile, "w")
     console.log(`logging to ${logFile}`)
@@ -32,7 +34,7 @@ import yargs from 'yargs/yargs';
         let trimmed_prompt = prompt.split('// prompt //', 2)[1].trim()
         let interaction = trimmed_prompt + "\n////////////////////////////\n"
         await log(interaction)
-        const [completions, suffix] = await gpt.askCommand(prompt)
+        const [completions, _suffix] = await gpt.askCommand(prompt)
         log(JSON.stringify(completions.data.choices[0]))
         // filter debug a bit
         let debugChoices = [] as string[]

@@ -6,12 +6,14 @@ export class Crawler {
     private browser: Browser;
     private page: Page;
     private idMapping = new Map<number, any>()
-    private constructor() {}
     private error?: string
 
-    private async init() {
+    constructor() {
+    }
+
+    private async init(headless: boolean) {
         this.browser = await puppeteer.launch({
-            headless: "HEADLESS" in process.env,
+            headless: headless,
             userDataDir: "google-chrome",
         });
         this.page = await this.browser.newPage();
@@ -188,9 +190,9 @@ export class Crawler {
         await this.page.waitForNavigation({ waitUntil: "networkidle2" });
     }
 
-    static async create(): Promise<Crawler> {
+    static async create(headless: boolean): Promise<Crawler> {
         const crawler = new Crawler();
-        await crawler.init();
+        await crawler.init(headless);
         return crawler;
     }
 }

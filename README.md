@@ -7,6 +7,7 @@ Running:
 * run `npm install`
 * run `export OPENAI_API_KEY=<your key>`
 * Run gpt-aria: `./gpt-aria.ts --objective "Whats the price of iphone 13 pro"`
+* Note first run will take a while as puppeteer has to download chrome
 * Run it starting custom start page: `./gpt-aria.ts --objective "Whats the price of iphone 14 pro" --start-url https://duckduckgo.com`
 
 Prompt lives in `prompt.ts`, log of execution is in `log.txt`
@@ -16,6 +17,7 @@ Questions? https://discord.gg/jgWgkQvp
 
 Sample queries:
 * who was president when first starwars was released?
+* `./gpt-aria.ts --objective "What is the cultural capital of western ukraine" --start-url https://bing.com --headless`
 
 # Observations
 * With certain prompting styles code-davinci-002 is identical text-davinci-003
