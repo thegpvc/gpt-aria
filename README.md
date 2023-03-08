@@ -1,5 +1,22 @@
 # aria-gpt
 
+
+Running:
+
+* Install node
+* run `npm install`
+* run `export OPENAI_API_KEY=<your key>`
+* Run gpt-aria: `./index2.ts "Whats the price of iphone 13 pro"`
+* Run it starting custom start page: `./index2.ts "Whats the price of iphone 13 pro" https://www.apple.com/iphone/`
+
+Prompt lives in `prompt.ts`, log of execution is in `log.txt`
+
+
+Questions? https://discord.gg/jgWgkQvp
+
+Sample queries:
+* who was president when first starwars was released?
+
 ## Using chrome accessibility tree to turn the web into a textual interface and access it like a user of a screen-reader
 
 **Marketing Goal**: to produce a content-marketing blog post like: https://dagster.io/blog/chatgpt-langchain
