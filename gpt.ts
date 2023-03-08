@@ -15,12 +15,12 @@ export class GPTDriver {
       let promptTemplate = await fs.readFile("prompt.ts", "utf8")
       let prefix = '{"progressAssessment":'
       let prompt = promptTemplate.trim()
-          .replace("$objective", (state.objectivePrompt))
+          .replace("$objective", (state.objective))
           .replace("$url", (state.url))
           .replace('"$output"}})', '')
           .replace('$ariaTreeJSON', state.ariaTree)
         //   .replace('"$browserError"', state.browserError ? JSON.stringify(state.browserError) : 'undefined')
-          .replace('["$objectiveProgress"]', JSON.stringify(state.objectiveProgress))
+          .replace('["$objectiveProgress"]', JSON.stringify(state.progress))
           ;
         return [prompt, prefix]
     }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node --loader tsx
-import { Crawler } from "./crawler";
-import { GPTDriver } from "./gptdriver"
+import { Browser } from "./browser";
+import { GPTDriver } from "./gpt"
 import { promises as fs } from "fs";
 import { ActionStep } from "./prompt";
 import yargs from 'yargs/yargs';
@@ -16,7 +16,7 @@ import yargs from 'yargs/yargs';
         usage('Usage: $0 --objective <objective> [--start-url <url-to-visit-first>]').
         parseSync();
 
-    const crawler = await Crawler.create(argv.headless);
+    const browser = await Browser.create(argv.headless);
     const gpt = new GPTDriver(argv["openai-api-key"]!);
     const logFile = "log.txt"
     let fd = await fs.open(logFile, "w")
@@ -26,10 +26,10 @@ import yargs from 'yargs/yargs';
     }
 
     const startUrl = argv["start-url"]
-    await crawler.goTo(startUrl);
+    await browser.goTo(startUrl);
     let objectiveProgress = [] as string[];
     do {
-        const state = await crawler.state(argv.objective, objectiveProgress);
+        const state = await browser.state(argv.objective, objectiveProgress);
         const [prompt, prefix] = await gpt.prompt(state)
         let trimmed_prompt = prompt.split('// prompt //', 2)[1].trim()
         let interaction = trimmed_prompt + "\n////////////////////////////\n"
@@ -64,21 +64,21 @@ import yargs from 'yargs/yargs';
             console.error("Did not receive a valid response")
             process.exit(1)
         }
-        objectiveProgress.push(responseObj.actionDescription);
+        objectiveProgress.push(responseObj.description);
         interaction = JSON.stringify(responseObj)
         await log(interaction)
-        if (responseObj.actionCommand.kind === "ObjectiveComplete") {
+        if (responseObj.command.kind === "ObjectiveComplete") {
             console.log("Objective:" + argv.objective)
             console.log("Objective Progress:")
             console.log(objectiveProgress.join("\n"))
             console.log("Progress Assessment:")
             console.log(responseObj.progressAssessment)
             console.log("Result:")
-            console.log(responseObj.actionCommand.result)
+            console.log(responseObj.command.result)
             process.exit(0)
         } else {
             console.log(responseObj)
-            await crawler.transitionState(responseObj.actionCommand)
+            await browser.performAction(responseObj.command)
         }
     } while (true);
 })();
