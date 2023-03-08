@@ -5,6 +5,11 @@ import { backOff, BackoffOptions } from "exponential-backoff";
 
 export class GPTDriver {
     private lastAttemptCount = 0
+    private OPENAI_API_KEY: string
+
+    constructor(OPENAI_API_KEY: string) {
+        this.OPENAI_API_KEY = OPENAI_API_KEY
+    }
 
     async prompt(state: ObjectiveState): Promise<[string, string]> {
       let promptTemplate = await fs.readFile("prompt.ts", "utf8")
@@ -21,10 +26,7 @@ export class GPTDriver {
     }
 
     async askCommand(prompt:string): Promise<[Completion, string]> {
-        if (!process.env.OPENAI_API_KEY) {
-          throw new Error("cat not set");
-        }
-        const openai = new OpenAI(process.env.OPENAI_API_KEY);
+        const openai = new OpenAI(this.OPENAI_API_KEY);
 
         const suffix = '})'
         let self = this
