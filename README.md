@@ -1,6 +1,6 @@
 # aria-gpt
 
-## Using chrome accessibility tree to turn the web into a textual interface and access it like a blind user
+## Using chrome accessibility tree to turn the web into a textual interface and access it like a user of a screen-reader
 
 **Marketing Goal**: to produce a content-marketing blog post like: https://dagster.io/blog/chatgpt-langchain
 
