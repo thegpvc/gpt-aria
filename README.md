@@ -17,6 +17,11 @@ Questions? https://discord.gg/jgWgkQvp
 Sample queries:
 * who was president when first starwars was released?
 
+# Observations
+* With certain prompting styles code-davinci-002 is identical text-davinci-003
+* Multiple completions are an interesting signal of the model's certainty
+* Shoveling in a lot of context can be done via code, this eliminates a lot of validation work, avoids having to specify serialization/rpc strategy.
+
 ## Using chrome accessibility tree to turn the web into a textual interface and access it like a user of a screen-reader
 
 **Marketing Goal**: to produce a content-marketing blog post like: https://dagster.io/blog/chatgpt-langchain

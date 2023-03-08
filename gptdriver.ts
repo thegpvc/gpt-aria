@@ -1,16 +1,12 @@
-// import async fs
 import { promises as fs } from "fs";
-// rewrite as typescript
-// const OpenAI = require('openai-api');
 import OpenAI, { Completion } from 'openai-api'
-import { textSpanContainsPosition } from "typescript";
-import { BrowserState, GptResponse } from "./prompt";
+import { ObjectiveState } from "./prompt";
 import { backOff, BackoffOptions } from "exponential-backoff";
 
 export class GPTDriver {
     private lastAttemptCount = 0
 
-    async prompt(state: BrowserState): Promise<[string, string]> {
+    async prompt(state: ObjectiveState): Promise<[string, string]> {
       let promptTemplate = await fs.readFile("prompt.ts", "utf8")
       let prefix = '{"progressAssessment":'
       let prompt = promptTemplate.trim()
@@ -18,7 +14,7 @@ export class GPTDriver {
           .replace("$url", (state.url))
           .replace('"$output"}})', '')
           .replace('$ariaTreeJSON', state.ariaTree)
-          .replace('"$browserError"', state.browserError ? JSON.stringify(state.browserError) : 'undefined')
+        //   .replace('"$browserError"', state.browserError ? JSON.stringify(state.browserError) : 'undefined')
           .replace('["$objectiveProgress"]', JSON.stringify(state.objectiveProgress))
           ;
         return [prompt, prefix]
@@ -51,9 +47,6 @@ export class GPTDriver {
                 n: 3,
                 suffix: suffix,
                 stop: suffix,
-                // Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
-                // this helps a lot
-                // frequency_penalty:2,
             })
         }, backOffOptions);
 
