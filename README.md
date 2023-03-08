@@ -1,4 +1,4 @@
-# aria-gpt
+# gpt-aria
 
 
 Running:
@@ -6,8 +6,8 @@ Running:
 * Install node
 * run `npm install`
 * run `export OPENAI_API_KEY=<your key>`
-* Run gpt-aria: `./index2.ts "Whats the price of iphone 13 pro"`
-* Run it starting custom start page: `./index2.ts "Whats the price of iphone 13 pro" https://www.apple.com/iphone/`
+* Run gpt-aria: `./gpt-aria.ts --objective "Whats the price of iphone 13 pro"`
+* Run it starting custom start page: `./gpt-aria.ts --objective "Whats the price of iphone 14 pro" --start-url https://duckduckgo.com`
 
 Prompt lives in `prompt.ts`, log of execution is in `log.txt`
 

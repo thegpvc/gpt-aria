@@ -19,7 +19,8 @@ export class GPTDriver {
           ;
         return [prompt, prefix]
     }
-    async askCommand(prompt:string, prefix: string): Promise<[Completion, string]> {
+
+    async askCommand(prompt:string): Promise<[Completion, string]> {
         if (!process.env.OPENAI_API_KEY) {
           throw new Error("cat not set");
         }

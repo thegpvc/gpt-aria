@@ -32,7 +32,7 @@ import yargs from 'yargs/yargs';
         let trimmed_prompt = prompt.split('// prompt //', 2)[1].trim()
         let interaction = trimmed_prompt + "\n////////////////////////////\n"
         await log(interaction)
-        const [completions, suffix] = await gpt.askCommand(prompt, prefix)
+        const [completions, suffix] = await gpt.askCommand(prompt)
         log(JSON.stringify(completions.data.choices[0]))
         // filter debug a bit
         let debugChoices = [] as string[]
