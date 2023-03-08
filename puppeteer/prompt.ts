@@ -1,21 +1,25 @@
-// This is TypeScript
-
+type Generic = [number, string, string, AccessibilityTree[]?]
+type Content = string | number
+type Image = ["img", string]
+export type AccessibilityTree = Generic | Content | Image
 export type ObjectiveState = {
     objectivePrompt: string, // objective set by user
     objectiveProgress: string[], // summary of previous actions taken towards objective
     url: string, // current page url
-    ariaTree: string //JSON of ariaTree for url in format [index, role, name, [children]]
+    ariaTree: string //JSON of ariaTree of AccessibilityTree type
  }
  export type BrowserAction = {
+    kind: "BrowserAction",
     index: number, // index for ariaTree element
     params?: string[] // input for combobox, textbox, or searchbox elements
  }
- export type ObjectiveResponse = {
+ export type ObjectiveComplete = {
+    kind: "ObjectiveComplete",
     result: string // response to objectivePrompt in conversational tone
  }
- export type GptResponse = BrowserAction | ObjectiveResponse  // either the next browser action or a final response to the objectivePrompt
+ export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
  export type ActionStep = {
-    progressAssessment: string, //decide if enough info to return an ObjectiveResponse or if a next BrowserAction is needed
+    progressAssessment: string, //decide if enough info to return an ObjectiveComplete or if a next BrowserAction is needed
     actionCommand: GptResponse, // action
     actionDescription: string // brief description of actionCommand
  }
@@ -35,7 +39,7 @@ export type ObjectiveState = {
     },
     actionstep: {
         "progressAssessment": "Do not have enough information in ariaTree to return an Objective Result.",
-        "actionCommand": {"index": 5, "params": ["gadget 11 pro price"]},
+        "actionCommand": {"kind": "BrowserAction", "index": 5, "params": ["gadget 11 pro price"]},
         "actionDescription": "Searched `gadget 11 pro price`"
     }})
 
@@ -48,7 +52,7 @@ export type ObjectiveState = {
     },
     actionstep: {
         "progressAssessment": "Per search results in ariaTree: Early Voting won Preakness Stakes in 2022. Do not have enough information to return objective result. Now need to find out who was president in 2022",
-        "actionCommand": {"index": 7, "params": ["2022 president"]},
+        "actionCommand": {"kind": "BrowserAction", "index": 7, "params": ["2022 president"]},
         "actionDescription": "Early Voting won Preakness Stakes on `May 21, 2022`. This is a partial answer to `early voting Preakness Stakes win` so searched `2022 president`"
     }})
 
@@ -61,7 +65,7 @@ export type ObjectiveState = {
     },
     actionstep: {
         "progressAssessment": "Per search results in ariaTree: Ted Kennedy was born on February 22, 1932, returning Objective result.",
-        "actionCommand": {"result": "Ted Kennedy was born on February 22, 1932."},
+        "actionCommand": {"kind": "ObjectiveComplete", "result": "Ted Kennedy was born on February 22, 1932."},
         "actionDescription": "Ted Kennedy was born on `February 22, 1932` according to search results. This is a reasonable answer to `When was Ted Kennedy Born` in objectivePrompt."
     }})
 
@@ -74,7 +78,7 @@ assertNextActionStep({
     },
     actionstep: {
         "progressAssessment": "Content in ariaTree wants me to accept terms. I will click accept when nothing more relevant to click.",
-        "actionCommand": {"index" : 7},
+        "actionCommand": {"kind": "BrowserAction", "index" : 7},
         "actionDescription": "Clicked Accept"
     }})
 

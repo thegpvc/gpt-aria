@@ -1,6 +1,5 @@
 import puppeteer, { Browser, ElementHandle, Page, SerializedAXNode } from "puppeteer";
-import { ContinueCommand, NextState, AccessibilityTree } from "./command";
-import { BrowserCommand, ObjectiveState } from "./prompt";
+import { AccessibilityTree, BrowserAction, ObjectiveState } from "./prompt";
 import { MAIN_WORLD } from "puppeteer";
 
 export class Crawler {
@@ -9,7 +8,6 @@ export class Crawler {
     private idMapping = new Map<number, any>()
     private constructor() {}
     private error?: string
-    private lastCommand?: BrowserCommand
 
     private async init() {
         this.browser = await puppeteer.launch({
@@ -39,9 +37,8 @@ export class Crawler {
         return content
     }
 
-    async transitionState(command: BrowserCommand) {
+    async transitionState(command: BrowserAction) {
         this.error = undefined
-        command = command as ContinueCommand
         try {
             if (command.index !== undefined) {
                 let e = await this.findElement(command.index)
@@ -60,8 +57,7 @@ export class Crawler {
             await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (e) {
             this.error = e.toString()
-            console.log(this.error)
-            this.lastCommand = command
+            console.error(this.error)
         }
     }
 
@@ -97,14 +93,14 @@ export class Crawler {
         switch (node.role) {
             case "StaticText":
             case "generic":
-                return node.name
+                return node.name!
             case "img":
-                return ["img", node.name]
+                return ["img", node.name!]
             default:
                 break;
         }
         let index = this.idMapping.size
-        let e: AccessibilityTree = [index, node.role, node.name]
+        let e: AccessibilityTree = [index, node.role, node.name!]
         this.idMapping.set(index, e)
         let children = [] as AccessibilityTree[]
         if (node.children) {
@@ -157,7 +153,7 @@ export class Crawler {
         let role = e[1]
         let name = e[2]
 
-        console.log(index + " " + role + " " + name)
+        // console.log(index + " " + role + " " + name)
 
         let client = (this.page as any)._client();
         const body = await this.page.$("body");
@@ -190,12 +186,6 @@ export class Crawler {
         const el = await this.findElement(role, name);
         await el.click();
         await this.page.waitForNavigation({ waitUntil: "networkidle2" });
-    }
-
-    private async resolveNodeFromBackendNodeId(frame, backendNodeId): Promise<ElementHandle<Element>> {
-        const ctx = await Promise.resolve(frame.executionContext())
-        console.log(ctx)
-        return ctx._adoptBackendNodeId(backendNodeId)
     }
 
     static async create(): Promise<Crawler> {

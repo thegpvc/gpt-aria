@@ -2,40 +2,42 @@
 import { Crawler } from "./crawler";
 import { GPTDriver } from "./gptdriver"
 import { promises as fs } from "fs";
-import { GptResponse } from "./prompt";
+import { ActionStep } from "./prompt";
+import yargs from 'yargs/yargs';
 
 (async () => {
-    let objective = process.argv[2];
-    const objectiveARIA = objective
+    const argv = yargs(process.argv.slice(2)).options({
+        objective: { type: 'string', demandOption: true, description: 'Natural language objective for gpt-aria to complete' },
+        "start-url": { default: 'https://google.com/?hl=en' },
+        "log-output": { default: 'log.txt' },
+        }).
+        usage('Usage: $0 --objective <objective> [--start-url <url-to-visit-first>]').
+        parseSync();
+
     const crawler = await Crawler.create();
     const gpt = new GPTDriver();
     const logFile = "log.txt"
-    // open logFile for writing, replace existing contents if exist
     let fd = await fs.open(logFile, "w")
-    // let objectiveProgress = [] as string[]
     console.log(`logging to ${logFile}`)
     async function log(info) {
         await fs.appendFile(fd, info)
-        console.log(info)
-
     }
 
-    const startUrl = process.argv[3] || "https://google.com/?hl=en"
+    const startUrl = argv["start-url"]
     await crawler.goTo(startUrl);
     let objectiveProgress = [] as string[];
     do {
-        const state = await crawler.state(objectiveARIA, objectiveProgress);
+        const state = await crawler.state(argv.objective, objectiveProgress);
         const [prompt, prefix] = await gpt.prompt(state)
         let trimmed_prompt = prompt.split('// prompt //', 2)[1].trim()
         let interaction = trimmed_prompt + "\n////////////////////////////\n"
         await log(interaction)
-//         await new Promise(f => setTimeout(f, 3000000));
         const [completions, suffix] = await gpt.askCommand(prompt, prefix)
-        console.log(completions.data.choices[0])
+        log(JSON.stringify(completions.data.choices[0]))
         // filter debug a bit
         let debugChoices = [] as string[]
         for (let choice of completions.data.choices) {
-            delete choice['index']
+            delete (choice as any)['index']
             delete choice['logprobs']
             let json = JSON.stringify(choice)
             let json_debug = "DEBUG:" + json + "\n"
@@ -45,7 +47,7 @@ import { GptResponse } from "./prompt";
             debugChoices.push(json_debug)
         }
         log(debugChoices.join(""))
-        let responseObj: GptResponse | undefined = undefined
+        let responseObj: ActionStep | undefined = undefined
         for (const choice of completions.data.choices) {
             let response = prefix + choice.text //+ suffix
             try {
@@ -63,8 +65,8 @@ import { GptResponse } from "./prompt";
         objectiveProgress.push(responseObj.actionDescription);
         interaction = JSON.stringify(responseObj)
         await log(interaction)
-        if (responseObj.actionCommand.result) {
-            console.log("Objective:" + objective)
+        if (responseObj.actionCommand.kind === "ObjectiveComplete") {
+            console.log("Objective:" + argv.objective)
             console.log("Objective Progress:")
             console.log(objectiveProgress.join("\n"))
             console.log("Progress Assessment:")
@@ -73,6 +75,7 @@ import { GptResponse } from "./prompt";
             console.log(responseObj.actionCommand.result)
             process.exit(0)
         } else {
+            console.log(responseObj)
             await crawler.transitionState(responseObj.actionCommand)
         }
     } while (true);

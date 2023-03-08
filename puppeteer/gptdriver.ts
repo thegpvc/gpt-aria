@@ -37,7 +37,7 @@ export class GPTDriver {
             startingDelay: (Math.max(0, this.lastAttemptCount - 1) + 1) * 100,
             retry: (e: any, attemptNumber: number) => {
                 self.lastAttemptCount = attemptNumber
-                console.log(`Retry #${attemptNumber} after openai.complete error ${e}`)
+                console.warn(`Retry #${attemptNumber} after openai.complete error ${e}`)
                 return true;
             }
         }
