@@ -18,6 +18,7 @@ Questions? https://discord.gg/jgWgkQvp
 Sample queries:
 * who was president when first starwars was released?
 * `./gpt-aria.ts --objective "What is the cultural capital of western ukraine" --start-url https://bing.com --headless`
+* `./gpt-aria.ts --objective "Who was king of england when lviv was founded"  --headless`
 
 # Observations
 * With certain prompting styles code-davinci-002 is identical text-davinci-003
@@ -28,34 +29,34 @@ Sample queries:
 ```mermaid
 graph TD;
     User --"{objective, start-url}"--> gpt-aria
-    gpt-aria --"ObjectiveState\n[objectivePrompt,objectiveProgress,url,ariaTree]"--> GPT
-    GPT--"ActionStep"-->gpt-aria{gpt-aria}
-    gpt-aria --ObjectiveComplete--> Summary
-    gpt-aria --BrowserAction--> Browser
+    gpt-aria --"ObjectiveState\n[objective,progress[],url,ariaTree]"--> GPT
+    GPT--"GptResponse"-->gpt-aria{gpt-aria}
+    gpt-aria--"ObjectiveComplete\nresult"--> Summary
+    gpt-aria --BrowserAction\nindex,params--> Browser
     Browser --AccessibilityTree--> gpt-aria
 ```
 ```typescript
 export type ObjectiveState = {
-    objectivePrompt: string, // objective set by user
-    objectiveProgress: string[], // summary of previous actions taken towards objective
+    objective: string, // objective set by user
+    progress: string[], // summary of previous actions taken towards objective
     url: string, // current page url
     ariaTree: string //JSON of ariaTree of AccessibilityTree type
-}
-export type BrowserAction = {
+ }
+ export type BrowserAction = {
     kind: "BrowserAction",
     index: number, // index for ariaTree element
     params?: string[] // input for combobox, textbox, or searchbox elements
-}
-export type ObjectiveComplete = {
+ }
+ export type ObjectiveComplete = {
     kind: "ObjectiveComplete",
     result: string // response to objectivePrompt in conversational tone
-}
-export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
-export type ActionStep = {
+ }
+ export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
+ export type ActionStep = {
     progressAssessment: string, //decide if enough info to return an ObjectiveComplete or if a next BrowserAction is needed
-    actionCommand: GptResponse, // action
-    actionDescription: string // brief description of actionCommand
-}
+    command: GptResponse, // action
+    description: string // brief description of actionCommand
+ }
 declare function assertNextActionStep(input_output:{objectivestate:ObjectiveState, actionstep:ActionStep})
 
 ```
