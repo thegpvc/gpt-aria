@@ -28,13 +28,23 @@ Sample queries:
 
 ```mermaid
 graph TD;
-    User --"{objective, start-url}"--> gpt-aria
-    gpt-aria --"ObjectiveState\n[objective,progress[],url,ariaTree]"--> GPT
-    GPT--"GptResponse"-->gpt-aria{gpt-aria}
-    gpt-aria--"ObjectiveComplete\nresult"--> Summary
-    gpt-aria --BrowserAction\nindex,params--> Browser
-    Browser --AccessibilityTree--> gpt-aria
+    subgraph GPT
+      gpt["if (facts(progress, ariaTree).satisfied(objective))"]
+    end
+    subgraph gpt-aria
+        BrowserAction
+        ObjectiveComplete
+        BrowserResponse
+    end
+    gpt-->ObjectiveComplete
+    gpt--command-->BrowserAction
+    BrowserAction--"command"-->Browser
+    Browser --"url,ariaTree"--> BrowserResponse
+    UserInput --"{objective, start-url}"--> BrowserAction
+    BrowserResponse --"objective,progress[],url,ariaTree"--> gpt
+    ObjectiveComplete--"result"--> UserOutput
 ```
+
 ```typescript
 export type ObjectiveState = {
     objective: string, // objective set by user
@@ -51,14 +61,13 @@ export type ObjectiveState = {
     kind: "ObjectiveComplete",
     result: string // response to objectivePrompt in conversational tone
  }
- export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
+ export type GptResponse = BrowserAction | ObjectiveComplete
  export type ActionStep = {
     progressAssessment: string, //decide if enough info to return an ObjectiveComplete or if a next BrowserAction is needed
-    command: GptResponse, // action
+    command: GptResponse, // if (facts(progress, ariaTree).satisfied(objective))
     description: string // brief description of actionCommand
  }
 declare function assertNextActionStep(input_output:{objectivestate:ObjectiveState, actionstep:ActionStep})
-
 ```
 
 ## Using chrome accessibility tree to turn the web into a textual interface and access it like a user of a screen-reader

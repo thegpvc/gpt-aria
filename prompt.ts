@@ -7,23 +7,23 @@ export type ObjectiveState = {
     progress: string[], // summary of previous actions taken towards objective
     url: string, // current page url
     ariaTree: string //JSON of ariaTree of AccessibilityTree type
- }
- export type BrowserAction = {
+}
+export type BrowserAction = {
     kind: "BrowserAction",
     index: number, // index for ariaTree element
     params?: string[] // input for combobox, textbox, or searchbox elements
- }
- export type ObjectiveComplete = {
+}
+export type ObjectiveComplete = {
     kind: "ObjectiveComplete",
-    result: string // response to objectivePrompt in conversational tone
- }
- export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
- export type ActionStep = {
-    progressAssessment: string, //decide if enough info to return an ObjectiveComplete or if a next BrowserAction is needed
+    result: string // objective result in conversational tone
+}
+export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
+export type ActionStep = {
+    progressAssessment: string, // decide if enough info to return an ObjectiveComplete or if a next BrowserAction is needed
     command: GptResponse, // action
     description: string // brief description of actionCommand
- }
- /** Function that controls the browser
+}
+/** Function that controls the browser
   @returns the next ActionStep
  */
  declare function assertNextActionStep(input_output:{objectivestate:ObjectiveState, actionstep:ActionStep})
