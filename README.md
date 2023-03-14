@@ -40,31 +40,6 @@ graph TD;
     ObjectiveComplete--"result"--> UserOutput
 ```
 
-```typescript
-export type ObjectiveState = {
-    objective: string, // objective set by user
-    progress: string[], // summary of previous actions taken towards objective
-    url: string, // current page url
-    ariaTree: string //JSON of ariaTree of AccessibilityTree type
-}
-export type BrowserAction = {
-    kind: "BrowserAction",
-    index: number, // index for ariaTree element
-    params?: string[] // input for combobox, textbox, or searchbox elements
-}
-export type ObjectiveComplete = {
-    kind: "ObjectiveComplete",
-    result: string // objective result in conversational tone
-}
-export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
-export type ActionStep = {
-    progressAssessment: string, // decide if enough info to return an ObjectiveComplete or if another BrowserAction is needed
-    command: GptResponse, // action
-    description: string // brief description of actionCommand
-}
-declare function assertNextActionStep(input_output:{objectivestate:ObjectiveState, actionstep:ActionStep})
-```
-
 # Prior art:
 * https://github.com/nat/natbot
 * https://yihui.dev/actgpt
