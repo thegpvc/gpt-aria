@@ -19,7 +19,7 @@ export type ObjectiveComplete = {
 }
 export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
 export type ActionStep = {
-    progressAssessment: string, // decide if enough info to return an ObjectiveComplete or if a next BrowserAction is needed
+    progressAssessment: string, // decide if enough info to return an ObjectiveComplete or if another BrowserAction is needed
     command: GptResponse, // action
     description: string // brief description of actionCommand
 }

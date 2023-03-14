@@ -1,5 +1,6 @@
 # gpt-aria
 
+Experiment to teach gpt to make use of the chrome accessibility tree to turn the web into a textual interface and access it like a user of a screen-reader. This avoids html parsing, supports dynamic content, etc.
 
 Running:
 
@@ -12,24 +13,18 @@ Running:
 
 Prompt lives in `prompt.ts`, log of execution is in `log.txt`
 
-
 Questions? https://discord.gg/jgWgkQvp
 
 Sample queries:
-* who was president when first starwars was released?
 * `./gpt-aria.ts --objective "What is the cultural capital of western ukraine" --start-url https://bing.com --headless`
 * `./gpt-aria.ts --objective "Who was king of england when lviv was founded"  --headless`
+* who was president when first starwars was released?
 
-# Observations
-* With certain prompting styles code-davinci-002 is identical text-davinci-003
-* Multiple completions are an interesting signal of the model's certainty
-* Shoveling in a lot of context can be done via code, this eliminates a lot of validation work, avoids having to specify serialization/rpc strategy.
-
-
+# Design
 ```mermaid
 graph TD;
     subgraph GPT
-      gpt["if (facts(progress, ariaTree).satisfied(objective))"]
+      gpt["decide if enough info\nto return an ObjectiveComplete\nor if a BrowserAction is needed"]
     end
     subgraph gpt-aria
         BrowserAction
@@ -51,49 +46,35 @@ export type ObjectiveState = {
     progress: string[], // summary of previous actions taken towards objective
     url: string, // current page url
     ariaTree: string //JSON of ariaTree of AccessibilityTree type
- }
- export type BrowserAction = {
+}
+export type BrowserAction = {
     kind: "BrowserAction",
     index: number, // index for ariaTree element
     params?: string[] // input for combobox, textbox, or searchbox elements
- }
- export type ObjectiveComplete = {
+}
+export type ObjectiveComplete = {
     kind: "ObjectiveComplete",
-    result: string // response to objectivePrompt in conversational tone
- }
- export type GptResponse = BrowserAction | ObjectiveComplete
- export type ActionStep = {
-    progressAssessment: string, //decide if enough info to return an ObjectiveComplete or if a next BrowserAction is needed
-    command: GptResponse, // if (facts(progress, ariaTree).satisfied(objective))
+    result: string // objective result in conversational tone
+}
+export type GptResponse = BrowserAction | ObjectiveComplete  // either the next browser action or a final response to the objectivePrompt
+export type ActionStep = {
+    progressAssessment: string, // decide if enough info to return an ObjectiveComplete or if another BrowserAction is needed
+    command: GptResponse, // action
     description: string // brief description of actionCommand
- }
+}
 declare function assertNextActionStep(input_output:{objectivestate:ObjectiveState, actionstep:ActionStep})
 ```
 
-## Using chrome accessibility tree to turn the web into a textual interface and access it like a user of a screen-reader
-
-**Marketing Goal**: to produce a content-marketing blog post like: https://dagster.io/blog/chatgpt-langchain
-
-**Technical goal**: 
-1. Create an extension where you can enter a task and have it perform a demo like: https://www.adept.ai/act
-2. Ideally we'd enable a new mode of browser interaction where a blind user can perform some task easier (eg summarization of article, or functionality to read out balance on credit card, etc)
-
-**Scope**: Tight, initial milestone is a "weekend" project: 3-4 days.
-
-**Prior art**:
+# Prior art:
 * https://github.com/nat/natbot
 * https://yihui.dev/actgpt
 
-Technical stack:
-* typescript in extension
-* https://plasmo.com/ framework
+# Why ARIA is superior to raw html
 
-### Why ARIA is superior to raw html
-
-html:
+### html:
 ![html](doc/html.png?raw=true "HTML is only good for renders")
 
-html with ARIA accessibility tree:
+### html with ARIA accessibility tree:
 ![accessibility_tree](doc/accessibility_tree.png?raw=true "HTML is only good for renders")
 
 ## Follow-up ideas
@@ -104,13 +85,3 @@ html with ARIA accessibility tree:
 * for shopping "amazon.com is a shopping site"
 * likewise for google, wikipedia, etc
 * eventually we'd want langchain-style website modules so you could specify "Summarize my inbox and news" which would be a composition of gmail and news modules
-
-### Chrome extension that accesses page aria
-
-https://github.com/ziolko/aria-devtools
-
-tangent: hook up chrome extension to google sheets via oaut
-
-https://stackoverflow.com/questions/55477723/how-to-integrate-google-sheet-to-chrome-extension
-
-https://stackoverflow.com/questions/48335559/google-sheets-api-with-chrome-extension-how-to-use
