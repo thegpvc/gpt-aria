@@ -53,6 +53,9 @@ graph TD;
 ![accessibility_tree](doc/accessibility_tree.png?raw=true "HTML is only good for renders")
 
 ## Follow-up ideas
+### Scrolling
+
+Would be nice to have a command so gpt could scroll up/down the page to summarize content in it
 
 ### Have an index of gpt prompts that explain in natural language how to navigate a particular website.
 * Eg for twitter it was say "In order to 'tweet', one goes to twitter.com and posts a tweet. in order to scan the latest news on twitter, one can pick use default timeline or pick a twitter list for a particular category".
