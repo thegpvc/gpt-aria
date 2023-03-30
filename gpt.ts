@@ -42,7 +42,7 @@ export class GPTDriver {
         }
         const completion = await backOff(() => {
             return openai.complete({
-                engine: "code-davinci-002",
+                engine: "text-davinci-003",
                 prompt: prompt,
                 maxTokens: 256,
                 temperature: 0.5,
