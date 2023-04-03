@@ -2,6 +2,8 @@
 
 Experiment to teach gpt to make use of the chrome accessibility tree to turn the web into a textual interface and access it like a user of a screen-reader. This avoids html parsing, supports dynamic content, etc.
 
+https://taras.glek.net/post/gpt-aria-experiment/
+
 Running:
 
 * Install node
