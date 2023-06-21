@@ -15,7 +15,7 @@ Running:
 
 Prompt lives in `prompt.ts`, log of execution is in `log.txt`
 
-Questions? https://discord.gg/jgWgkQvp
+Questions? @tarasglek on twitter or file github issues
 
 Sample queries:
 * `./gpt-aria.ts --objective "What is the cultural capital of western ukraine" --start-url https://bing.com --headless`
